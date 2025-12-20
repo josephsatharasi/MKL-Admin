@@ -81,10 +81,6 @@ const Dashboard = () => {
               <AlertTriangle size={20} />
               View Expiry Alerts
             </Link>
-            <Link to="/admin/reports" className="flex items-center gap-2 w-full bg-gradient-to-r from-teal-700 to-teal-800 text-white py-3 px-4 rounded-lg hover:from-teal-800 hover:to-teal-900 transition-colors font-semibold shadow-md">
-              <FileText size={20} />
-              Generate Reports
-            </Link>
           </div>
         </div>
 
