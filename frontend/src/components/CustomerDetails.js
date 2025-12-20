@@ -1,15 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Calendar, User, Phone, Mail, MapPin, Package } from 'lucide-react';
 import { getDaysUntilExpiry } from '../utils/storage';
 
 const CustomerDetails = ({ customer, onClose }) => {
   const daysLeft = getDaysUntilExpiry(customer.endDate);
+  const [spareParts, setSpareParts] = useState({
+    'Sediment Carbon': false,
+    'Post/Carbon': false,
+    'Membrane': false,
+    'Membrane Housing': false,
+    'SV': false,
+    'Pump': false,
+    'SMTS': false,
+    'Float': false,
+    'Diveter Wall': false,
+    'Pipe': false
+  });
+  const [totalPrice, setTotalPrice] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('UPI');
+
+  const handleCheckboxChange = (part) => {
+    setSpareParts(prev => ({ ...prev, [part]: !prev[part] }));
+  };
+
+  const handleSave = () => {
+    console.log('Saved:', { spareParts, totalPrice, paymentMethod });
+    alert('Data saved successfully!');
+  };
+
+  const handleEdit = () => {
+    console.log('Edit mode activated');
+  };
+
+  const getNextRemainderDate = () => {
+    const plan = parseInt(customer.plan);
+    const endDate = new Date(customer.endDate);
+    const today = new Date();
+    
+    if (plan === 3) {
+      return new Date(endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+    } else if (plan === 6) {
+      return new Date(endDate.getTime() - (60 * 24 * 60 * 60 * 1000));
+    } else if (plan === 12) {
+      return new Date(endDate.getTime() - (90 * 24 * 60 * 60 * 1000));
+    }
+    return endDate;
+  };
+
+  const handleNextRemainder = () => {
+    const nextDate = getNextRemainderDate();
+    alert(`Next remainder scheduled for: ${nextDate.toLocaleDateString()}`);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Customer Details</h2>
+          <h2 className="text-2xl font-bold">Customer Profile</h2>
           <button onClick={onClose} className="hover:bg-blue-700 p-2 rounded-lg transition-colors">
             <X size={24} />
           </button>
@@ -92,6 +139,88 @@ const CustomerDetails = ({ customer, onClose }) => {
                   {daysLeft < 0 ? 'Expired' : `${daysLeft} days`}
                 </span>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
+            <h3 className="font-bold text-purple-900 mb-3">Spare Parts</h3>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {Object.keys(spareParts).map((part) => (
+                <label key={part} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={spareParts[part]}
+                    onChange={() => handleCheckboxChange(part)}
+                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                  />
+                  <span className="text-sm text-gray-700">{part}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm text-gray-600 mb-1">Total Price</label>
+              <input
+                type="number"
+                value={totalPrice}
+                onChange={(e) => setTotalPrice(e.target.value)}
+                placeholder="Enter total price"
+                className="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm text-gray-600 mb-2">Payment Method</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="UPI"
+                    checked={paymentMethod === 'UPI'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-4 h-4 text-purple-600"
+                  />
+                  <span className="text-sm text-gray-700">UPI</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="Cash"
+                    checked={paymentMethod === 'Cash'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-4 h-4 text-purple-600"
+                  />
+                  <span className="text-sm text-gray-700">Cash</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="Card"
+                    checked={paymentMethod === 'Card'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-4 h-4 text-purple-600"
+                  />
+                  <span className="text-sm text-gray-700">Card</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleEdit}
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleNextRemainder}
+                className="flex-1 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+              >
+                Next Remainder
+              </button>
             </div>
           </div>
 

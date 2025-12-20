@@ -83,24 +83,24 @@ const AddCustomer = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-6">Add New Customer</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-teal-700 mb-6">Add New Customer</h1>
       
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-4 md:p-6 space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Customer Name *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Customer Name *</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             placeholder="Enter customer name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Phone Number *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Phone Number *</label>
           <input
             type="tel"
             name="phone"
@@ -109,46 +109,46 @@ const AddCustomer = () => {
             required
             maxLength="10"
             pattern="[0-9]{10}"
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             placeholder="9876543210"
           />
           <p className="text-xs text-gray-500 mt-1">Enter 10 digit mobile number (numbers only)</p>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Email *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Email *</label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             placeholder="customer@email.com"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Address *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Address *</label>
           <textarea
             name="address"
             value={formData.address}
             onChange={handleChange}
             required
             rows="3"
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             placeholder="Enter complete address"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Select Partner *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Select Partner *</label>
           <select
             name="partnerId"
             value={formData.partnerId}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           >
             {partners.map(partner => (
               <option key={partner.id} value={partner.id}>
@@ -159,12 +159,12 @@ const AddCustomer = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Rental Plan *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Rental Plan *</label>
           <select
             name="plan"
             value={formData.plan}
             onChange={handleChange}
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           >
             <option value="3">3 Months</option>
             <option value="6">6 Months</option>
@@ -173,25 +173,25 @@ const AddCustomer = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-blue-900 mb-2">Start Date *</label>
+          <label className="block text-sm font-semibold text-teal-700 mb-2">Start Date *</label>
           <input
             type="date"
             name="startDate"
             value={formData.startDate}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border-2 border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
         </div>
 
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-2 border-blue-300">
+        <div className="bg-gradient-to-r from-teal-50 to-teal-100 p-4 rounded-lg border-2 border-teal-300">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-blue-700 font-semibold">End Date:</p>
-              <p className="text-lg font-bold text-blue-900">{calculateEndDate(formData.startDate, formData.plan)}</p>
+              <p className="text-sm text-teal-700 font-semibold">End Date:</p>
+              <p className="text-lg font-bold text-teal-700">{calculateEndDate(formData.startDate, formData.plan)}</p>
             </div>
             <div>
-              <p className="text-sm text-blue-700 font-semibold">Total Amount:</p>
+              <p className="text-sm text-teal-700 font-semibold">Total Amount:</p>
               <p className="text-2xl font-bold text-green-600">₹{formData.amount}</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ const AddCustomer = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <button
             type="submit"
-            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-colors font-semibold shadow-md"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white py-3 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-colors font-semibold shadow-md"
           >
             <Save size={20} />
             Add Customer & Download Receipt
@@ -208,7 +208,7 @@ const AddCustomer = () => {
           <button
             type="button"
             onClick={() => navigate('/admin/customers')}
-            className="flex items-center justify-center gap-2 px-6 bg-gray-300 text-blue-900 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+            className="flex items-center justify-center gap-2 px-6 bg-gray-300 text-teal-700 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold"
           >
             <X size={20} />
             Cancel

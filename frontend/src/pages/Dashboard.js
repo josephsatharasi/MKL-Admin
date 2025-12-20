@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, CheckCircle, AlertTriangle, XCircle, UserPlus, FileText } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, XCircle, UserPlus, FileText, TrendingUp, Calendar } from 'lucide-react';
 import { getCustomers, getDaysUntilExpiry } from '../utils/storage';
 
 const Dashboard = () => {
@@ -10,6 +10,8 @@ const Dashboard = () => {
     expiringSoon: 0,
     expired: 0,
   });
+
+  const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
     const customers = getCustomers();
@@ -28,6 +30,13 @@ const Dashboard = () => {
       expiringSoon,
       expired,
     });
+
+    const recent = customers.slice(0, 5).map(c => ({
+      name: c.name,
+      date: new Date(c.startDate).toLocaleDateString(),
+      plan: `${c.planDuration} Months`
+    }));
+    setRecentActivity(recent);
   }, []);
 
   const cards = [
@@ -39,7 +48,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-6">Dashboard</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-teal-700 mb-6">Dashboard</h1>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         {cards.map((card, index) => {
@@ -62,9 +71,9 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-blue-900 mb-4">Quick Actions</h2>
+          <h2 className="text-xl font-bold text-teal-700 mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <Link to="/admin/add-customer" className="flex items-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-colors font-semibold shadow-md">
+            <Link to="/admin/add-customer" className="flex items-center gap-2 w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white py-3 px-4 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-colors font-semibold shadow-md">
               <UserPlus size={20} />
               Add New Customer
             </Link>
@@ -72,7 +81,7 @@ const Dashboard = () => {
               <AlertTriangle size={20} />
               View Expiry Alerts
             </Link>
-            <Link to="/admin/reports" className="flex items-center gap-2 w-full bg-gradient-to-r from-blue-900 to-blue-800 text-white py-3 px-4 rounded-lg hover:from-blue-800 hover:to-blue-700 transition-colors font-semibold shadow-md">
+            <Link to="/admin/reports" className="flex items-center gap-2 w-full bg-gradient-to-r from-teal-700 to-teal-800 text-white py-3 px-4 rounded-lg hover:from-teal-800 hover:to-teal-900 transition-colors font-semibold shadow-md">
               <FileText size={20} />
               Generate Reports
             </Link>
@@ -80,20 +89,27 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-blue-900 mb-4">System Info</h2>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between p-3 bg-blue-50 rounded-lg">
-              <span className="font-semibold text-blue-900">Last Updated:</span>
-              <span className="text-blue-700">{new Date().toLocaleDateString()}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-blue-50 rounded-lg">
-              <span className="font-semibold text-blue-900">Plan Types:</span>
-              <span className="text-blue-700">3, 6, 12 Months</span>
-            </div>
-            <div className="flex justify-between p-3 bg-blue-50 rounded-lg">
-              <span className="font-semibold text-blue-900">Alert Threshold:</span>
-              <span className="text-blue-700">7 Days</span>
-            </div>
+          <h2 className="text-xl font-bold text-teal-700 mb-4 flex items-center gap-2">
+            <TrendingUp size={24} />
+            Recent Activity
+          </h2>
+          <div className="space-y-3">
+            {recentActivity.length > 0 ? (
+              recentActivity.map((activity, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-teal-50 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-teal-700">{activity.name}</p>
+                    <p className="text-sm text-teal-600">{activity.plan}</p>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-teal-600">
+                    <Calendar size={16} />
+                    {activity.date}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-center py-4">No recent activity</p>
+            )}
           </div>
         </div>
       </div>
