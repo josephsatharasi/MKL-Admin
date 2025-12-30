@@ -75,7 +75,7 @@ const CustomerDetails = ({ customer, onClose }) => {
               <Package className="text-blue-600 mt-1" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Recent Service Date</p>
-                <p className="font-semibold text-blue-900">{customer.service} Months</p>
+                <p className="font-semibold text-blue-900">{customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-GB') : 'N/A'}</p>
               </div>
             </div>
 
