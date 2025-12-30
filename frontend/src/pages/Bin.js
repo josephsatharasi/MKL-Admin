@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, RotateCcw, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://mkl-admin-backend.onrender.com/api';
 
 const Bin = () => {
   const [deletedCustomers, setDeletedCustomers] = useState([]);
@@ -22,34 +22,30 @@ const Bin = () => {
   };
 
   const handleRestore = async (id, name) => {
-    if (window.confirm(`Restore ${name}?`)) {
-      try {
-        const response = await fetch(`${API_URL}/bin/restore/${id}`, {
-          method: 'POST',
-        });
-        if (response.ok) {
-          toast.success(`${name} restored successfully!`);
-          loadDeletedCustomers();
-        }
-      } catch (error) {
-        toast.error('Failed to restore customer');
+    try {
+      const response = await fetch(`${API_URL}/bin/restore/${id}`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        toast.success(`${name} restored successfully!`);
+        loadDeletedCustomers();
       }
+    } catch (error) {
+      toast.error('Failed to restore customer');
     }
   };
 
   const handlePermanentDelete = async (id, name) => {
-    if (window.confirm(`Permanently delete ${name}? This cannot be undone!`)) {
-      try {
-        const response = await fetch(`${API_URL}/bin/${id}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          toast.success(`${name} permanently deleted`);
-          loadDeletedCustomers();
-        }
-      } catch (error) {
-        toast.error('Failed to delete customer');
+    try {
+      const response = await fetch(`${API_URL}/bin/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        toast.success(`${name} permanently deleted`);
+        loadDeletedCustomers();
       }
+    } catch (error) {
+      toast.error('Failed to delete customer');
     }
   };
 
