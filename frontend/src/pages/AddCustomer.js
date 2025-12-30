@@ -60,8 +60,10 @@ const AddCustomer = () => {
     try {
       const customerData = { ...formData, profilePic };
       console.log('Submitting customer with profilePic:', profilePic ? 'Yes' : 'No');
+      console.log('ProfilePic length:', profilePic ? profilePic.length : 0);
       const newCustomer = await addCustomer(customerData);
       console.log('Saved customer:', newCustomer);
+      console.log('Saved customer has profilePic:', newCustomer.profilePic ? 'Yes' : 'No');
       setSavedCustomer({ ...newCustomer, profilePic });
       toast.success(`${newCustomer.name} added successfully!`);
     } catch (error) {

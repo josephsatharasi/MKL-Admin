@@ -3,11 +3,13 @@ import { Trash2, Search, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getCustomers, deleteCustomer } from '../utils/storage';
 import CustomerDetails from '../components/CustomerDetails';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
 
   useEffect(() => {
     loadCustomers();
@@ -18,12 +20,10 @@ const Customers = () => {
     setCustomers(data);
   };
 
-  const handleDelete = async (id, name) => {
-    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
-      await deleteCustomer(id);
-      loadCustomers();
-      toast.success(`${name} deleted successfully!`);
-    }
+  const handleDelete = async () => {
+    await deleteCustomer(customerToDelete.id);
+    loadCustomers();
+    toast.success(`${customerToDelete.name} deleted successfully!`);
   };
 
 
@@ -99,7 +99,7 @@ const Customers = () => {
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(customer._id || customer.id, customer.name);
+                          setCustomerToDelete({ id: customer._id || customer.id, name: customer.name });
                         }} 
                         className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform"
                         title="Delete Customer"
@@ -121,6 +121,14 @@ const Customers = () => {
       {selectedCustomer && (
         <CustomerDetails customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />
       )}
+
+      <ConfirmModal
+        isOpen={!!customerToDelete}
+        onClose={() => setCustomerToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Customer"
+        message={`Are you sure you want to delete ${customerToDelete?.name}? This action cannot be undone.`}
+      />
     </div>
   );
 };
