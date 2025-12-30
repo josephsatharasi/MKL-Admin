@@ -121,7 +121,7 @@ const CustomInvoice = () => {
     yPos += 20;
     doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
-    doc.text('Spare Parts Replaced:', 20, yPos);
+    doc.text('Spare Parts:', 20, yPos);
     
     yPos += 8;
     doc.setFontSize(9);
@@ -249,7 +249,7 @@ const CustomInvoice = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Spare Parts Replaced</label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Spare Parts</label>
           <div className="grid grid-cols-2 gap-2 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
             {Object.keys(formData.spareParts).map((part) => (
               <label key={part} className="flex items-center gap-2 cursor-pointer">
