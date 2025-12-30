@@ -10,9 +10,21 @@ const CustomInvoice = () => {
     email: '',
     address: '',
     brand: '',
-    service: '',
     amount: '',
-    paymentMode: 'Cash'
+    paymentMode: 'Cash',
+    spareParts: {
+      'Sediment Carbon': false,
+      'Post/Carbon': false,
+      'Membrane': false,
+      'Membrane Housing': false,
+      'SV': false,
+      'Pump': false,
+      'SMTS': false,
+      'Float': false,
+      'Diveter Wall': false,
+      'Pipe': false
+    },
+    images: []
   });
 
   const handleChange = (e) => {
@@ -23,6 +35,19 @@ const CustomInvoice = () => {
       return;
     }
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (part) => {
+    setFormData(prev => ({
+      ...prev,
+      spareParts: { ...prev.spareParts, [part]: !prev.spareParts[part] }
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const imageUrls = files.map(file => URL.createObjectURL(file));
+    setFormData(prev => ({ ...prev, images: [...prev.images, ...imageUrls] }));
   };
 
   const generateInvoice = () => {
@@ -91,10 +116,32 @@ const CustomInvoice = () => {
     doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
     doc.text(`Purifier Brand: ${formData.brand}`, 20, yPos + 10);
-    if (formData.service) doc.text(`Service Plan: ${formData.service} Months`, 20, yPos + 18);
+    
+    // Spare Parts Used
+    yPos += 20;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('Spare Parts Replaced:', 20, yPos);
+    
+    yPos += 8;
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    let partCount = 0;
+    Object.entries(formData.spareParts).forEach(([part, used]) => {
+      if (used) {
+        partCount++;
+        doc.text(`  ${partCount}. ${part} - Completed`, 25, yPos);
+        yPos += 7;
+      }
+    });
+    
+    if (partCount === 0) {
+      doc.text('  No parts replaced', 25, yPos);
+      yPos += 7;
+    }
     
     // Payment Details
-    yPos += formData.service ? 33 : 25;
+    yPos += 5;
     doc.setFillColor(240, 240, 240);
     doc.rect(20, yPos, pageWidth - 40, 25, 'F');
     
@@ -199,6 +246,41 @@ const CustomInvoice = () => {
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter brand name"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Spare Parts Replaced</label>
+          <div className="grid grid-cols-2 gap-2 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+            {Object.keys(formData.spareParts).map((part) => (
+              <label key={part} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.spareParts[part]}
+                  onChange={() => handleCheckboxChange(part)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">{part}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Upload Images</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {formData.images.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              {formData.images.map((img, idx) => (
+                <img key={idx} src={img} alt="Service" className="w-full h-24 object-cover rounded" />
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

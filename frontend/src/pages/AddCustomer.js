@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, X, Download, Upload, User } from 'lucide-react';
+import { Save, X, Download, Upload, User, Calendar } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { addCustomer } from '../utils/storage';
 import jsPDF from 'jspdf';
@@ -10,6 +10,7 @@ const AddCustomer = () => {
   const [savedCustomer, setSavedCustomer] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 16));
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -107,9 +108,10 @@ const AddCustomer = () => {
     doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
     const receiptId = `#${Date.now().toString().slice(-4)}`;
-    const currentDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '/');
+    const invoiceDate = new Date(selectedDate);
+    const formattedDate = invoiceDate.toLocaleDateString('en-GB').replace(/\//g, '/');
     doc.text(`Receipt ID: ${receiptId}`, 20, 78);
-    doc.text(`Date: ${currentDate}`, pageWidth - 20, 78, { align: 'right' });
+    doc.text(`Date: ${formattedDate}`, pageWidth - 20, 78, { align: 'right' });
     
     // Customer Details Section
     doc.setFontSize(11);
@@ -140,8 +142,8 @@ const AddCustomer = () => {
     doc.text(`Partner: ${savedCustomer.brand}`, 20, addressY + 18);
     doc.text(`Plan Duration: ${savedCustomer.service} Months`, 20, addressY + 26);
     
-    const startDate = new Date();
-    const endDate = new Date();
+    const startDate = new Date(selectedDate);
+    const endDate = new Date(selectedDate);
     endDate.setMonth(endDate.getMonth() + parseInt(savedCustomer.service));
     
     doc.text(`Start Date: ${startDate.toLocaleDateString('en-GB').replace(/\//g, '-')}`, 20, addressY + 34);
@@ -295,7 +297,7 @@ const AddCustomer = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Service Plan <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Next Reminder <span className="text-red-500">*</span></label>
           <select
             name="service"
             value={formData.service}
@@ -303,7 +305,7 @@ const AddCustomer = () => {
             required
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">Select Service Plan</option>
+            <option value="">Select Next Reminder</option>
             <option value="3">3 Months</option>
             <option value="6">6 Months</option>
             <option value="12">12 Months</option>
@@ -330,6 +332,20 @@ const AddCustomer = () => {
             <option value="Local">Local</option>
             <option value="Flipkart">Flipkart</option>
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Service Date & Time <span className="text-red-500">*</span></label>
+          <div className="relative">
+            <input
+              type="datetime-local"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              required
+              className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <Calendar className="absolute right-3 top-3 text-blue-400 pointer-events-none" size={20} />
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">

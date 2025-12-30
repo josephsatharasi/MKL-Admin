@@ -74,7 +74,7 @@ const CustomerDetails = ({ customer, onClose }) => {
             <div className="flex items-start gap-3">
               <Package className="text-blue-600 mt-1" size={20} />
               <div>
-                <p className="text-sm text-gray-600">Service Plan</p>
+                <p className="text-sm text-gray-600">Recent Service Date</p>
                 <p className="font-semibold text-blue-900">{customer.service} Months</p>
               </div>
             </div>
