@@ -4,7 +4,7 @@ import { UserPlus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import logo from '../assets/logo.JPG';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const Register = () => {
   const navigate = useNavigate();
