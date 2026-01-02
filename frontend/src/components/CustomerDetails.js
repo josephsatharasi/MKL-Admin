@@ -31,7 +31,15 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
     }
   };
 
-  const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date();
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const [year, month, day] = dateStr.split('-');
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  };
+
+  const serviceDate = customer.serviceDate 
+    ? parseDate(customer.serviceDate) 
+    : (customer.createdAt ? new Date(customer.createdAt) : new Date());
   const expireDate = new Date(serviceDate);
   expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
   const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -143,7 +151,14 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
               <Package className="text-blue-600 mt-1" size={20} />
               <div>
                 <p className="text-sm text-gray-600">Recent Service Date</p>
-                <p className="font-semibold text-blue-900">{customer.serviceDate ? new Date(customer.serviceDate).toLocaleDateString('en-GB') : (customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-GB') : 'N/A')}</p>
+                <p className="font-semibold text-blue-900">
+                  {customer.serviceDate 
+                    ? (() => {
+                        const [year, month, day] = customer.serviceDate.split('-');
+                        return `${day}/${month}/${year}`;
+                      })()
+                    : (customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A')}
+                </p>
               </div>
             </div>
 

@@ -10,7 +10,7 @@ const AddCustomer = () => {
   const [savedCustomer, setSavedCustomer] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 16));
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -59,9 +59,13 @@ const AddCustomer = () => {
     }
     
     try {
-      const customerData = { ...formData, profilePic, serviceDate: selectedDate };
+      const datePart = selectedDate.includes('T') ? selectedDate.split('T')[0] : selectedDate;
+      console.log('Selected Date:', selectedDate);
+      console.log('Date Part to save:', datePart);
+      const customerData = { ...formData, profilePic, serviceDate: datePart };
       const newCustomer = await addCustomer(customerData);
-      setSavedCustomer({ ...newCustomer, profilePic, serviceDate: selectedDate });
+      console.log('Saved customer serviceDate:', newCustomer.serviceDate);
+      setSavedCustomer({ ...newCustomer, profilePic, serviceDate: datePart });
       toast.success(`${newCustomer.name} added successfully!`);
     } catch (error) {
       toast.error(error.message || 'Failed to add customer');
@@ -333,8 +337,8 @@ const AddCustomer = () => {
           <label className="block text-sm font-semibold text-gray-800 mb-2">Service Date & Time <span className="text-red-500">*</span></label>
           <div className="relative">
             <input
-              type="datetime-local"
-              value={selectedDate}
+              type="date"
+              value={selectedDate.split('T')[0]}
               onChange={(e) => setSelectedDate(e.target.value)}
               required
               className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -368,7 +372,7 @@ const AddCustomer = () => {
                     brand: '',
                   });
                   setProfilePic(null);
-                  setSelectedDate(new Date().toISOString().slice(0, 16));
+                  setSelectedDate(new Date().toISOString().slice(0, 10));
                 }}
                 className="flex items-center justify-center gap-2 px-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >
