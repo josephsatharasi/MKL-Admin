@@ -78,14 +78,14 @@ const Customers = () => {
       <div className="rounded-xl shadow-lg overflow-hidden bg-white">
         <div className="overflow-x-auto overflow-y-auto" style={{maxHeight: '500px'}}>
           <table className="w-full">
-            <thead className="text-white sticky top-0 z-10" style={{background: '#3ea4f0'}}>
+            <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
               <tr>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Phone</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm hidden md:table-cell">Email</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Area</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Brand</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Service</th>
+                <th className="px-4 md:px-6 py-3 text-left text-sm">Next Remainder</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Actions</th>
               </tr>
             </thead>
@@ -94,14 +94,14 @@ const Customers = () => {
                 <tr 
                   key={customer.id} 
                   className="cursor-pointer"
-                  style={{backgroundColor: index % 2 !== 0 ? '#3ea4f01A' : 'white'}}
+                  style={{backgroundColor: index % 2 !== 0 ? '#1e3a8a1A' : 'white'}}
                   onClick={() => setSelectedCustomer(customer)}
                 >
-                  <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#3ea4f0'}}>{customer.name}</td>
+                  <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{customer.name}</td>
                   <td className="px-4 md:px-6 py-4 text-sm">{customer.phone}</td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">{customer.email}</td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">
-                    <span className="px-2 py-1 rounded text-xs font-semibold" style={{backgroundColor: '#3ea4f0' + '33', color: '#3ea4f0'}}>{customer.area}</span>
+                    <span className="px-2 py-1 rounded text-xs font-semibold" style={{backgroundColor: '#1e3a8a' + '33', color: '#1e3a8a'}}>{customer.area}</span>
                   </td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">{customer.brand}</td>
                   <td className="px-4 md:px-6 py-4 text-sm">{customer.service}M</td>
@@ -113,7 +113,7 @@ const Customers = () => {
                           setSelectedCustomer(customer);
                         }} 
                         className="hover:scale-110 transition-transform"
-                        style={{color: '#3ea4f0'}}
+                        style={{color: '#1e3a8a'}}
                         title="View Details"
                       >
                         <Eye size={18} />

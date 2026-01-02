@@ -197,14 +197,14 @@ const AddCustomer = () => {
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Profile Picture</label>
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center overflow-hidden bg-gray-50" style={{borderColor: '#3ea4f0'}}>
+            <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center overflow-hidden bg-gray-50" style={{borderColor: '#1e3a8a'}}>
               {profilePic ? (
                 <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <User size={32} className="text-gray-400" />
               )}
             </div>
-            <label className="flex items-center gap-2 px-4 py-2 text-white rounded-lg cursor-pointer transition-colors" style={{background: '#3ea4f0'}}>
+            <label className="flex items-center gap-2 px-4 py-2 text-white rounded-lg cursor-pointer transition-colors" style={{background: '#1e3a8a'}}>
               <Upload size={18} />
               Upload Photo
               <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
@@ -343,7 +343,7 @@ const AddCustomer = () => {
               required
               className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <Calendar className="absolute right-3 top-3 pointer-events-none" style={{color: '#3ea4f0'}} size={20} />
+            <Calendar className="absolute right-3 top-3 pointer-events-none" style={{color: '#1e3a8a'}} size={20} />
           </div>
         </div>
 
@@ -374,7 +374,7 @@ const AddCustomer = () => {
                   setProfilePic(null);
                   setSelectedDate(new Date().toISOString().slice(0, 10));
                 }}
-                className="flex items-center justify-center gap-2 px-6 text-white py-3 rounded-lg transition-colors font-semibold" style={{background: '#3ea4f0'}}
+                className="flex items-center justify-center gap-2 px-6 text-white py-3 rounded-lg transition-colors font-semibold" style={{background: '#1e3a8a'}}
               >
                 Add Another
               </button>
@@ -383,7 +383,7 @@ const AddCustomer = () => {
             <>
               <button
                 type="submit"
-                className="flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors font-semibold shadow-md" style={{background: '#3ea4f0'}}
+                className="flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors font-semibold shadow-md" style={{background: '#1e3a8a'}}
               >
                 <Save size={20} />
                 Save
@@ -391,7 +391,7 @@ const AddCustomer = () => {
               <button
                 type="button"
                 onClick={() => navigate('/admin/customers')}
-                className="flex items-center justify-center gap-2 px-6 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold" style={{color: '#3ea4f0'}}
+                className="flex items-center justify-center gap-2 px-6 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold" style={{color: '#1e3a8a'}}
               >
                 <X size={20} />
                 Cancel

@@ -59,7 +59,7 @@ const Bin = () => {
       <div className="rounded-xl shadow-lg overflow-hidden bg-white">
         <div className="overflow-x-auto overflow-y-auto" style={{maxHeight: '500px'}}>
           <table className="w-full">
-            <thead className="text-white sticky top-0 z-10" style={{background: '#3ea4f0'}}>
+            <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
               <tr>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Phone</th>
@@ -72,9 +72,9 @@ const Bin = () => {
               {deletedCustomers.map((customer, index) => (
                 <tr 
                   key={customer._id} 
-                  className="cursor-pointer" style={{backgroundColor: index % 2 === 0 ? 'white' : '#3ea4f01A'}}
+                  className="cursor-pointer" style={{backgroundColor: index % 2 === 0 ? 'white' : '#1e3a8a1A'}}
                 >
-                  <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#3ea4f0'}}>{customer.name}</td>
+                  <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{customer.name}</td>
                   <td className="px-4 md:px-6 py-4 text-sm">{customer.phone}</td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">{customer.email}</td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">

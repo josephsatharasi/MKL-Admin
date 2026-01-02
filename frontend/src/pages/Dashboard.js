@@ -23,6 +23,8 @@ const Dashboard = () => {
       let expired = 0;
       
       customers.forEach(customer => {
+        if (customer.followUpStatus === 'completed') return;
+        
         const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
         const expireDate = new Date(serviceDate);
         expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
@@ -50,8 +52,8 @@ const Dashboard = () => {
   const cards = [
     { title: 'Total Customers', value: stats.total, icon: Users, color: 'bg-blue-50', link: '/admin/customers' },
     { title: 'Total Service Customers', value: stats.active, icon: CheckCircle, color: 'bg-blue-50', link: '/admin/current-month-customers' },
-    { title: 'Service Soon', value: stats.expiringSoon, icon: AlertTriangle, color: 'bg-blue-50', link: '/admin/expiry-alerts' },
-    { title: 'Service Delay', value: stats.expired, icon: XCircle, color: 'bg-blue-50', link: '/admin/customers?filter=expired' },
+    { title: 'Service Soon', value: stats.expiringSoon, icon: AlertTriangle, color: 'bg-blue-50', link: '/admin/service-soon' },
+    { title: 'Service Delay', value: stats.expired, icon: XCircle, color: 'bg-blue-50', link: '/admin/service-delay' },
   ];
 
   return (
@@ -63,7 +65,7 @@ const Dashboard = () => {
           const Icon = card.icon;
           return (
             <Link key={index} to={card.link}>
-              <div className={`${card.color} rounded-xl shadow-lg p-6 hover:scale-105 transition-transform cursor-pointer`}>
+              <div className={`${card.color} rounded-xl shadow-lg p-6 hover:scale-105 transition-transform cursor-pointer`} style={{backgroundColor: '#1e3a8a1A'}}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-700">{card.title}</p>
@@ -80,7 +82,7 @@ const Dashboard = () => {
       <div className="rounded-xl shadow-lg p-6 bg-white border border-gray-200 max-w-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
         <div className="space-y-3">
-          <Link to="/admin/add-customer" className="flex items-center gap-2 w-full text-white py-3 px-4 rounded-lg transition-colors font-semibold shadow-md" style={{background: '#3ea4f0'}}>
+          <Link to="/admin/add-customer" className="flex items-center gap-2 w-full text-white py-3 px-4 rounded-lg transition-colors font-semibold shadow-md" style={{background: '#1e3a8a'}}>
             <UserPlus size={20} />
             Add New Customer
           </Link>

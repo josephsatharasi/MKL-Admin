@@ -14,7 +14,9 @@ const NewServices = () => {
   const [showAddService, setShowAddService] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [savedService, setSavedService] = useState(null);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
   const [customerServiceDates, setCustomerServiceDates] = useState({});
+  const API_URL = process.env.REACT_APP_API_URL || 'https://mkl-admin-backend.onrender.com/api';
   const [serviceData, setServiceData] = useState({
     spareParts: {
       'Sediment': false,
@@ -67,7 +69,16 @@ const NewServices = () => {
     const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          c.phone.includes(searchTerm);
     const matchesArea = !areaFilter || c.area === areaFilter;
-    return matchesSearch && matchesArea;
+    
+    const serviceDate = c.serviceDate ? new Date(c.serviceDate) : new Date();
+    const expireDate = new Date(serviceDate);
+    expireDate.setMonth(expireDate.getMonth() + parseInt(c.service || 0));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    expireDate.setHours(0, 0, 0, 0);
+    const isExpired = expireDate < today;
+    
+    return matchesSearch && matchesArea && !isExpired;
   });
 
   const handleRowClick = async (customer) => {
@@ -139,6 +150,11 @@ const NewServices = () => {
   };
 
   const handleSaveService = async () => {
+    if (!serviceData.totalBill) {
+      toast.error('Please enter total bill amount');
+      return;
+    }
+    
     try {
       const serviceRecord = {
         customerId: selectedCustomer._id,
@@ -186,6 +202,22 @@ const NewServices = () => {
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save service');
+    }
+  };
+
+  const handleStatusChange = async (customerId, status) => {
+    try {
+      await fetch(`${API_URL}/customers/${customerId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const updatedCustomers = await getCustomers();
+      setCustomers(updatedCustomers);
+      toast.success('Status updated!');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update status');
     }
   };
 
@@ -306,19 +338,19 @@ const NewServices = () => {
 
       <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <Search className="absolute left-3 top-3" style={{color: '#3ea4f0'}} size={20} />
+          <Search className="absolute left-3 top-3" style={{color: '#1e3a8a'}} size={20} />
           <input
             type="text"
             placeholder="Search by name or phone number..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border-2 rounded-lg focus:outline-none focus:ring-2 shadow-sm" style={{borderColor: '#3ea4f033'}}
+            className="w-full pl-10 pr-4 py-3 bg-white border-2 rounded-lg focus:outline-none focus:ring-2 shadow-sm" style={{borderColor: '#1e3a8a33'}}
           />
         </div>
         <select
           value={areaFilter}
           onChange={(e) => setAreaFilter(e.target.value)}
-          className="w-full px-4 py-3 bg-white border-2 rounded-lg focus:outline-none focus:ring-2 shadow-sm" style={{borderColor: '#3ea4f033'}}
+          className="w-full px-4 py-3 bg-white border-2 rounded-lg focus:outline-none focus:ring-2 shadow-sm" style={{borderColor: '#1e3a8a33'}}
         >
           <option value="">All Areas</option>
           <option value="Pendurthi">Pendurthi</option>
@@ -342,7 +374,7 @@ const NewServices = () => {
       <div className="rounded-xl shadow-lg overflow-hidden bg-white">
         <div className="overflow-x-auto overflow-y-auto" style={{maxHeight: '500px'}}>
           <table className="w-full">
-            <thead className="text-white sticky top-0 z-10" style={{background: '#3ea4f0'}}>
+            <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
               <tr>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Phone</th>
@@ -362,20 +394,29 @@ const NewServices = () => {
                 const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const latestServiceDate = customerServiceDates[customer._id] ? new Date(customerServiceDates[customer._id]).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'No service';
                 
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                expireDate.setHours(0, 0, 0, 0);
+                const daysDelayed = Math.floor((today - expireDate) / (1000 * 60 * 60 * 24));
+                const isExpired = expireDate < today;
+                
                 return (
                   <tr 
                     key={customer._id || customer.id} 
                     onClick={() => handleRowClick(customer)}
-                    className="cursor-pointer" style={{backgroundColor: index % 2 === 0 ? 'white' : '#3ea4f01A'}}
+                    className="cursor-pointer" style={{backgroundColor: index % 2 === 0 ? 'white' : '#1e3a8a1A'}}
                   >
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#3ea4f0'}}>{customer.name}</td>
+                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{customer.name}</td>
                     <td className="px-4 md:px-6 py-4 text-sm">{customer.phone}</td>
                     <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">{customer.area}</td>
                     <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">{customer.address}</td>
                     <td className="px-4 md:px-6 py-4 text-sm">{customer.service}M</td>
                     <td className="px-4 md:px-6 py-4 text-sm">{customer.brand}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#3ea4f0'}}>{latestServiceDate}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold text-red-600">{formattedExpireDate}</td>
+                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{latestServiceDate}</td>
+                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: isExpired ? '#ef4444' : '#10b981'}}>
+                      {formattedExpireDate}
+                      {isExpired && <span className="ml-2 text-xs">({daysDelayed}d delay)</span>}
+                    </td>
                   </tr>
                 );
               })}
@@ -390,7 +431,7 @@ const NewServices = () => {
       {selectedCustomer && !showAddService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedCustomer(null)}>
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="text-white p-6 flex justify-between items-center" style={{background: '#3ea4f0'}}>
+            <div className="text-white p-6 flex justify-between items-center" style={{background: '#1e3a8a'}}>
               <h2 className="text-2xl font-bold">Service History - {selectedCustomer.name}</h2>
               <button onClick={() => setSelectedCustomer(null)} className="hover:bg-blue-500 p-2 rounded-lg transition-colors">
                 <X size={24} />
@@ -416,7 +457,7 @@ const NewServices = () => {
                     </select>
                     <button
                       onClick={handleAddService}
-                      className="flex items-center gap-2 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm" style={{background: '#3ea4f0'}}
+                      className="flex items-center gap-2 text-white px-4 py-2 rounded-lg transition-colors font-semibold text-sm" style={{background: '#1e3a8a'}}
                     >
                       <Plus size={18} />
                       Add New Service
@@ -454,7 +495,7 @@ const NewServices = () => {
       {showAddService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddService(false)}>
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="text-white p-6 flex justify-between items-center" style={{background: '#3ea4f0'}}>
+            <div className="text-white p-6 flex justify-between items-center" style={{background: '#1e3a8a'}}>
               <h2 className="text-2xl font-bold">{selectedService ? 'View Service' : 'Add New Service'}</h2>
               <button onClick={() => setShowAddService(false)} className="hover:bg-blue-500 p-2 rounded-lg transition-colors">
                 <X size={24} />
@@ -481,9 +522,15 @@ const NewServices = () => {
                   {selectedService.images && selectedService.images.length > 0 ? (
                     <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
                       <h3 className="font-bold text-blue-900 mb-3">Service Images ({selectedService.images.length})</h3>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {selectedService.images.map((img, idx) => (
-                          <img key={idx} src={img} alt="Service" className="w-full h-32 object-cover rounded border" />
+                          <img 
+                            key={idx} 
+                            src={img} 
+                            alt="Service" 
+                            className="w-full h-48 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity" 
+                            onClick={() => setFullScreenImage(img)}
+                          />
                         ))}
                       </div>
                     </div>
@@ -566,12 +613,13 @@ const NewServices = () => {
                     <h3 className="font-bold text-blue-900 mb-3">Billing Details</h3>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm text-gray-700 mb-1">Total Bill</label>
+                        <label className="block text-sm text-gray-700 mb-1">Total Bill <span className="text-red-600">*</span></label>
                         <input
                           type="number"
                           value={serviceData.totalBill}
                           onChange={(e) => setServiceData(prev => ({ ...prev, totalBill: e.target.value }))}
                           placeholder="Enter total amount"
+                          required
                           className="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
@@ -607,7 +655,7 @@ const NewServices = () => {
                         </button>
                         <button
                           onClick={() => { setShowAddService(false); setSavedService(null); }}
-                          className="flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors font-semibold" style={{background: '#3ea4f0'}}
+                          className="flex-1 flex items-center justify-center gap-2 text-white py-3 rounded-lg transition-colors font-semibold" style={{background: '#1e3a8a'}}
                         >
                           Close
                         </button>
@@ -627,6 +675,25 @@ const NewServices = () => {
                 </>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {fullScreenImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={() => setFullScreenImage(null)}>
+          <img src={fullScreenImage} alt="Full screen" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+          <div className="absolute top-4 right-4 flex gap-2">
+            <a 
+              href={fullScreenImage} 
+              download={`service-image-${Date.now()}.jpg`}
+              className="text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 p-2 rounded"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Download size={24} />
+            </a>
+            <button onClick={() => setFullScreenImage(null)} className="text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 p-2 rounded">
+              <X size={24} />
+            </button>
           </div>
         </div>
       )}

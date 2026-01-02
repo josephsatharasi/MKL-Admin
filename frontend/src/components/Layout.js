@@ -28,7 +28,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
   return (
     <div className="flex h-screen bg-white">
       {/* Desktop Sidebar */}
-      <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} text-white transition-all duration-300 hidden md:flex flex-col shadow-xl`} style={{background: 'linear-gradient(to bottom, #3ea4f0, #2a8fd6)'}}>
+      <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} text-white transition-all duration-300 hidden md:flex flex-col shadow-xl`} style={{background: '#1e3a8a'}}>
         <div className="p-4 flex items-center justify-between border-b border-blue-400">
           {isSidebarOpen && (
             <Link to="/admin">
@@ -52,7 +52,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
                     ? 'text-white shadow-lg'
                     : 'text-blue-50'
                 }`}
-                style={location.pathname === item.path ? {background: '#3ea4f0'} : {}}
+                style={location.pathname === item.path ? {background: '#1e3a8a'} : {}}
               >
                 <Icon size={20} />
                 {isSidebarOpen && <span>{item.label}</span>}
@@ -88,7 +88,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="fixed left-0 top-0 h-full w-64 text-white z-50" style={{background: 'linear-gradient(to bottom, #3ea4f0, #2a8fd6)'}} onClick={(e) => e.stopPropagation()}>
+          <div className="fixed left-0 top-0 h-full w-64 text-white z-50" style={{background: '#1e3a8a'}} onClick={(e) => e.stopPropagation()}>
             <div className="p-4 flex items-center justify-between" style={{borderBottom: '1px solid rgba(255,255,255,0.3)'}}>
               <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
                 <img src={logo} alt="MKL" className="h-16 bg-white p-1 rounded" />
@@ -111,7 +111,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
                         ? 'text-white'
                         : 'text-blue-50'
                     }`}
-                    style={location.pathname === item.path ? {background: '#3ea4f0'} : {}}
+                    style={location.pathname === item.path ? {background: '#1e3a8a'} : {}}
                   >
                     <Icon size={20} />
                     <span>{item.label}</span>
@@ -140,7 +140,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
       <main className="flex-1 overflow-auto">
         <header className="shadow-md p-4 flex items-center justify-between bg-white border-b border-gray-200">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden" style={{color: '#3ea4f0'}}>
+            <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden" style={{color: '#1e3a8a'}}>
               <Menu size={24} />
             </button>
             <h2 className="text-xl md:text-2xl font-bold text-gray-800">MKL Water Purifier Admin</h2>

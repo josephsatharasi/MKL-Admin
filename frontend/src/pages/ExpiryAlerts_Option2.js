@@ -1,45 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Send, CheckCircle, Phone } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
+import axios from 'axios';
 
 const ExpiryAlerts = () => {
   const [expiringCustomers, setExpiringCustomers] = useState([]);
   const [followUpStatus, setFollowUpStatus] = useState({});
-  const [completionStatus, setCompletionStatus] = useState({});
 
   useEffect(() => {
-    const loadData = async () => {
-      const customers = await getCustomers();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const expiring = customers.filter(customer => {
-        const parseDate = (dateStr) => {
-          if (!dateStr) return null;
-          const [year, month, day] = dateStr.split('-');
-          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-        };
-        
-        const serviceDate = customer.serviceDate 
-          ? parseDate(customer.serviceDate) 
-          : new Date(customer.createdAt);
-        const expireDate = new Date(serviceDate);
-        expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
-        expireDate.setHours(0, 0, 0, 0);
-        
-        const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
-        
-        return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
-      });
-      
-      setExpiringCustomers(expiring);
-      
-      // Load saved completion status from localStorage
-      const saved = localStorage.getItem('followUpCompletion');
-      if (saved) setCompletionStatus(JSON.parse(saved));
-    };
     loadData();
   }, []);
+
+  const loadData = async () => {
+    const customers = await getCustomers();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const expiring = customers.filter(customer => {
+      if (customer.followUpStatus === 'completed') return false;
+      
+      const parseDate = (dateStr) => {
+        if (!dateStr) return null;
+        const [year, month, day] = dateStr.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      };
+      
+      const serviceDate = customer.serviceDate 
+        ? parseDate(customer.serviceDate) 
+        : new Date(customer.createdAt);
+      const expireDate = new Date(serviceDate);
+      expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+      expireDate.setHours(0, 0, 0, 0);
+      
+      const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+      
+      return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
+    });
+    
+    setExpiringCustomers(expiring);
+  };
 
   const sendReminder = (customer) => {
     alert(`Reminder sent to ${customer.name} at ${customer.email}`);
@@ -49,15 +48,16 @@ const ExpiryAlerts = () => {
     setFollowUpStatus(prev => ({ ...prev, [customerId]: !prev[customerId] }));
   };
 
-  const handleStatusChange = (customerId, status) => {
-    const updated = { ...completionStatus, [customerId]: status };
-    setCompletionStatus(updated);
-    localStorage.setItem('followUpCompletion', JSON.stringify(updated));
+  const handleStatusChange = async (customerId, status) => {
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      await axios.patch(`${API_URL}/customers/${customerId}/status`, { status });
+      loadData();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Failed to update status');
+    }
   };
-
-  const filteredCustomers = expiringCustomers.filter(
-    customer => completionStatus[customer._id || customer.id] !== 'completed'
-  );
 
   return (
     <div>
@@ -66,7 +66,7 @@ const ExpiryAlerts = () => {
         <p className="text-gray-600">Customers requiring subscription renewal follow-up</p>
       </div>
 
-      {filteredCustomers.length === 0 ? (
+      {expiringCustomers.length === 0 ? (
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
           <h2 className="text-2xl font-bold text-blue-900 mt-4">All Clear!</h2>
@@ -87,7 +87,7 @@ const ExpiryAlerts = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCustomers.map((customer, index) => (
+                {expiringCustomers.map((customer, index) => (
                   <tr 
                     key={customer._id || customer.id} 
                     style={{backgroundColor: index % 2 === 0 ? 'white' : '#1e3a8a1A'}}
@@ -98,11 +98,11 @@ const ExpiryAlerts = () => {
                     <td className="px-4 md:px-6 py-4 text-sm">{customer.service}M</td>
                     <td className="px-4 md:px-6 py-4 text-sm">
                       <select
-                        value={completionStatus[customer._id || customer.id] || 'pending'}
+                        value={customer.followUpStatus || 'pending'}
                         onChange={(e) => handleStatusChange(customer._id || customer.id, e.target.value)}
                         className="px-3 py-1 rounded border text-sm"
                         style={{
-                          color: completionStatus[customer._id || customer.id] === 'completed' ? '#10b981' : '#f59e0b',
+                          color: customer.followUpStatus === 'completed' ? '#10b981' : '#f59e0b',
                           borderColor: '#1e3a8a'
                         }}
                       >

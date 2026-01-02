@@ -156,8 +156,26 @@ const CustomInvoice = () => {
     const amountText = formData.amount ? `Amount Paid: Rs.${formData.amount} (${formData.paymentMode})` : 'Service Activated';
     doc.text(amountText, 25, yPos + 19);
     
+    // Notes Section
+    yPos += 35;
+    if (formData.notes) {
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('NOTES:', 20, yPos);
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      const noteLines = doc.splitTextToSize(formData.notes, pageWidth - 40);
+      yPos += 8;
+      noteLines.forEach(line => {
+        doc.text(line, 20, yPos);
+        yPos += 6;
+      });
+      yPos += 5;
+    }
+    
     // Footer
-    yPos += 40;
     doc.setLineWidth(0.5);
     doc.line(20, 260, pageWidth - 20, 260);
     

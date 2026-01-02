@@ -57,6 +57,21 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Update follow-up status
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const customer = await Customer.findByIdAndUpdate(
+      req.params.id,
+      { followUpStatus: req.body.status },
+      { new: true }
+    );
+    if (!customer) return res.status(404).json({ message: 'Customer not found' });
+    res.json(customer);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // Delete customer (move to bin)
 router.delete('/:id', async (req, res) => {
   try {
