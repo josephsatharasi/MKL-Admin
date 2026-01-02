@@ -53,6 +53,11 @@ const AddCustomer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!profilePic) {
+      toast.error('Please upload a profile picture');
+      return;
+    }
+    
     if (formData.phone.length !== 10) {
       toast.error('Phone number must be exactly 10 digits!');
       return;
@@ -195,7 +200,7 @@ const AddCustomer = () => {
       
       <form onSubmit={handleSubmit} className="rounded-xl shadow-lg p-4 md:p-6 space-y-4 bg-white border border-gray-200">
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Profile Picture</label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Profile Picture <span className="text-red-500">*</span></label>
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center overflow-hidden bg-gray-50" style={{borderColor: '#1e3a8a'}}>
               {profilePic ? (

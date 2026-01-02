@@ -14,13 +14,15 @@ const CustomInvoice = () => {
     paymentMode: 'Cash',
     notes: '',
     spareParts: {
-      'Sediment Carbon': false,
+      'Sediment': false,
+      'Carbon': false,
+      'Tap': false,
       'Post/Carbon': false,
       'Membrane': false,
       'Membrane Housing': false,
       'SV': false,
       'Pump': false,
-      'SMTS': false,
+      'SMPS': false,
       'Float': false,
       'Diveter Wall': false,
       'Pipe': false
