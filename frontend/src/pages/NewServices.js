@@ -128,11 +128,11 @@ const NewServices = () => {
         totalBill: serviceData.totalBill,
         paymentMode: serviceData.paymentMode,
         images: serviceData.images,
-        serviceDate: new Date(serviceData.serviceDate).toISOString(),
+        serviceDate: serviceData.serviceDate,
         reminderMonths: parseInt(serviceData.reminderMonths)
       };
       
-      console.log('Saving service with images:', serviceRecord.images.length);
+      console.log('Saving service with date:', serviceRecord.serviceDate);
       
       const response = await fetch('https://mkl-admin-backend.onrender.com/api/services', {
         method: 'POST',

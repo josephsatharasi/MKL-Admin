@@ -9,7 +9,29 @@ const ExpiryAlerts = () => {
   useEffect(() => {
     const loadData = async () => {
       const customers = await getCustomers();
-      setExpiringCustomers(customers);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const expiring = customers.filter(customer => {
+        const parseDate = (dateStr) => {
+          if (!dateStr) return null;
+          const [year, month, day] = dateStr.split('-');
+          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        };
+        
+        const serviceDate = customer.serviceDate 
+          ? parseDate(customer.serviceDate) 
+          : new Date(customer.createdAt);
+        const expireDate = new Date(serviceDate);
+        expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+        expireDate.setHours(0, 0, 0, 0);
+        
+        const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+        
+        return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
+      });
+      
+      setExpiringCustomers(expiring);
     };
     loadData();
   }, []);

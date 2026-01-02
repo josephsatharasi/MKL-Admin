@@ -7,7 +7,7 @@ const serviceSchema = new mongoose.Schema({
   totalBill: { type: Number, required: true },
   paymentMode: { type: String, required: true },
   images: { type: [String], default: [] },
-  serviceDate: { type: Date, default: Date.now }
+  serviceDate: { type: String, default: () => new Date().toISOString().split('T')[0] }
 });
 
 module.exports = mongoose.model('Service', serviceSchema);

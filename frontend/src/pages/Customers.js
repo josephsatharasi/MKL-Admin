@@ -4,12 +4,14 @@ import { toast } from 'react-toastify';
 import { getCustomers, deleteCustomer } from '../utils/storage';
 import CustomerDetails from '../components/CustomerDetails';
 import ConfirmModal from '../components/ConfirmModal';
+import { useSearchParams } from 'react-router-dom';
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     loadCustomers();
@@ -32,6 +34,24 @@ const Customers = () => {
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.phone.includes(searchTerm) ||
       (c.email && c.email.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    if (searchParams.get('filter') === 'expired') {
+      const parseDate = (dateStr) => {
+        if (!dateStr) return null;
+        const [year, month, day] = dateStr.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      };
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const serviceDate = c.serviceDate ? parseDate(c.serviceDate) : new Date(c.createdAt);
+      const expireDate = new Date(serviceDate);
+      expireDate.setMonth(expireDate.getMonth() + parseInt(c.service || 0));
+      expireDate.setHours(0, 0, 0, 0);
+      
+      const isExpired = expireDate < today;
+      return matchesSearch && isExpired;
+    }
     
     return matchesSearch;
   });
