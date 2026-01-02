@@ -59,13 +59,9 @@ const AddCustomer = () => {
     }
     
     try {
-      const customerData = { ...formData, profilePic };
-      console.log('Submitting customer with profilePic:', profilePic ? 'Yes' : 'No');
-      console.log('ProfilePic length:', profilePic ? profilePic.length : 0);
+      const customerData = { ...formData, profilePic, serviceDate: selectedDate };
       const newCustomer = await addCustomer(customerData);
-      console.log('Saved customer:', newCustomer);
-      console.log('Saved customer has profilePic:', newCustomer.profilePic ? 'Yes' : 'No');
-      setSavedCustomer({ ...newCustomer, profilePic });
+      setSavedCustomer({ ...newCustomer, profilePic, serviceDate: selectedDate });
       toast.success(`${newCustomer.name} added successfully!`);
     } catch (error) {
       toast.error(error.message || 'Failed to add customer');
@@ -372,6 +368,7 @@ const AddCustomer = () => {
                     brand: '',
                   });
                   setProfilePic(null);
+                  setSelectedDate(new Date().toISOString().slice(0, 16));
                 }}
                 className="flex items-center justify-center gap-2 px-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >

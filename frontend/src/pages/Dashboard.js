@@ -16,12 +16,32 @@ const Dashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       const customers = await getCustomers();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      let expiringSoon = 0;
+      let expired = 0;
+      
+      customers.forEach(customer => {
+        const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
+        const expireDate = new Date(serviceDate);
+        expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+        expireDate.setHours(0, 0, 0, 0);
+        
+        const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilExpiry < 0) {
+          expired++;
+        } else if (daysUntilExpiry <= 7) {
+          expiringSoon++;
+        }
+      });
       
       setStats({
         total: customers.length,
         active: customers.length,
-        expiringSoon: 0,
-        expired: 0,
+        expiringSoon,
+        expired,
       });
     };
     loadData();

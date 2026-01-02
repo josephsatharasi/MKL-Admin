@@ -39,7 +39,7 @@ const Customers = () => {
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Customers</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">All Customers</h1>
       </div>
 
       <div className="mb-4">
@@ -119,7 +119,7 @@ const Customers = () => {
       </div>
 
       {selectedCustomer && (
-        <CustomerDetails customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />
+        <CustomerDetails customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} onUpdate={loadCustomers} />
       )}
 
       <ConfirmModal

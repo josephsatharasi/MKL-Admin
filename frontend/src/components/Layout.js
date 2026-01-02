@@ -19,7 +19,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/add-customer', icon: UserPlus, label: 'Add Customer' },
-    { path: '/admin/customers', icon: Users, label: 'Customer Profiles' },
+    { path: '/admin/customers', icon: Users, label: 'All Customers' },
     { path: '/admin/new-services', icon: AlertTriangle, label: 'New Services' },
     { path: '/admin/custom-invoice', icon: FileText, label: 'Custom Invoice' },
     { path: '/admin/bin', icon: Trash2, label: 'Bin' },

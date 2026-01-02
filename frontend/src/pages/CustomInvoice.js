@@ -12,6 +12,7 @@ const CustomInvoice = () => {
     brand: '',
     amount: '',
     paymentMode: 'Cash',
+    notes: '',
     spareParts: {
       'Sediment Carbon': false,
       'Post/Carbon': false,
@@ -155,20 +156,8 @@ const CustomInvoice = () => {
     const amountText = formData.amount ? `Amount Paid: Rs.${formData.amount} (${formData.paymentMode})` : 'Service Activated';
     doc.text(amountText, 25, yPos + 19);
     
-    // Terms & Conditions
-    yPos += 40;
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'italic');
-    doc.text('Terms & Conditions:', 20, yPos);
-    
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(8);
-    doc.text('1. Regular maintenance included as per plan', 20, yPos + 8);
-    doc.text('2. Customer must notify 7 days before plan expiry for renewal', 20, yPos + 15);
-    doc.text('3. Installation charges may apply for new connections', 20, yPos + 22);
-    
     // Footer
+    yPos += 40;
     doc.setLineWidth(0.5);
     doc.line(20, 260, pageWidth - 20, 260);
     
@@ -312,6 +301,18 @@ const CustomInvoice = () => {
               </label>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Additional Notes</label>
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            rows="4"
+            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Add any additional notes or comments..."
+          />
         </div>
 
         <button

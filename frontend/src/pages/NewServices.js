@@ -31,7 +31,9 @@ const NewServices = () => {
     },
     images: [],
     totalBill: '',
-    paymentMode: 'UPI'
+    paymentMode: 'UPI',
+    serviceDate: new Date().toISOString().split('T')[0],
+    reminderMonths: '3'
   });
 
   useEffect(() => {
@@ -86,7 +88,9 @@ const NewServices = () => {
       },
       images: [],
       totalBill: '',
-      paymentMode: 'UPI'
+      paymentMode: 'UPI',
+      serviceDate: new Date().toISOString().split('T')[0],
+      reminderMonths: '3'
     });
   };
 
@@ -124,7 +128,8 @@ const NewServices = () => {
         totalBill: serviceData.totalBill,
         paymentMode: serviceData.paymentMode,
         images: serviceData.images,
-        serviceDate: new Date().toISOString()
+        serviceDate: new Date(serviceData.serviceDate).toISOString(),
+        reminderMonths: parseInt(serviceData.reminderMonths)
       };
       
       console.log('Saving service with images:', serviceRecord.images.length);
@@ -476,6 +481,38 @@ const NewServices = () => {
                           <span className="text-sm text-gray-700">{part}</span>
                         </label>
                       ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                    <h3 className="font-bold text-blue-900 mb-3">Service Date & Reminder</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Service Date</label>
+                        <input
+                          type="date"
+                          value={serviceData.serviceDate}
+                          onChange={(e) => setServiceData(prev => ({ ...prev, serviceDate: e.target.value }))}
+                          className="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-2">Next Service Reminder</label>
+                        <div className="flex gap-4">
+                          {['3', '6', '12'].map(months => (
+                            <label key={months} className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                value={months}
+                                checked={serviceData.reminderMonths === months}
+                                onChange={(e) => setServiceData(prev => ({ ...prev, reminderMonths: e.target.value }))}
+                                className="w-4 h-4 text-blue-600"
+                              />
+                              <span className="text-sm text-gray-700">{months} Months</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
