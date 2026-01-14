@@ -94,8 +94,8 @@ const Complaints = () => {
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Customer Name</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Subject</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm hidden md:table-cell">Details</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Status</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Date</th>
+                <th className="px-4 md:px-6 py-3 text-left text-sm">Status</th>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Actions</th>
               </tr>
             </thead>
@@ -110,11 +110,14 @@ const Complaints = () => {
                   <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>
                     {complaint.customerName}
                   </td>
-                  <td className="px-4 md:px-6 py-4 text-sm">{complaint.subject}</td>
+                  <td className="px-4 md:px-6 py-4 text-sm">
+                    {complaint.subject.length > 15 ? complaint.subject.substring(0, 15) + '....' : complaint.subject}
+                  </td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">
-                    <div className="max-w-xs">
-                      <div className="line-clamp-1">{complaint.body}</div>
-                    </div>
+                    {complaint.body.length > 15 ? complaint.body.substring(0, 15) + '....' : complaint.body}
+                  </td>
+                  <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">
+                    {new Date(complaint.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 md:px-6 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                     <select
@@ -129,9 +132,6 @@ const Complaints = () => {
                       <option value="pending">Pending</option>
                       <option value="resolved">Resolved</option>
                     </select>
-                  </td>
-                  <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">
-                    {new Date(complaint.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 md:px-6 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                     <button 

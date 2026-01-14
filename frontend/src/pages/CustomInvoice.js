@@ -16,6 +16,7 @@ const CustomInvoice = () => {
     spareParts: {
       'Sediment': false,
       'Carbon': false,
+      'Spun': false,
       'Tap': false,
       'Post/Carbon': false,
       'Membrane': false,
