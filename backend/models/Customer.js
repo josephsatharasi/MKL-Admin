@@ -9,6 +9,7 @@ const customerSchema = new mongoose.Schema({
   service: String,
   brand: String,
   profilePic: String,
+  additionalPics: { type: [String], default: [] },
   serviceDate: { type: String },
   followUpStatus: { type: String, enum: ['pending', 'completed'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
