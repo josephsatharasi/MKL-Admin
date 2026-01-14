@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Search, FileText, CheckCircle } from 'lucide-react';
+import { Trash2, Search, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ConfirmModal from '../components/ConfirmModal';
+import ComplaintModal from '../components/ComplaintModal';
 
 const Complaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [complaintToDelete, setComplaintToDelete] = useState(null);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
     loadComplaints();
@@ -15,7 +17,9 @@ const Complaints = () => {
 
   const loadComplaints = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/complaints`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/complaints`, {
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       const data = await response.json();
       setComplaints(data);
     } catch (error) {
@@ -25,7 +29,7 @@ const Complaints = () => {
 
   const handleDelete = async () => {
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/complaints/${complaintToDelete.id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/complaints/${complaintToDelete.id}`, {
         method: 'DELETE'
       });
       loadComplaints();
@@ -35,10 +39,10 @@ const Complaints = () => {
     }
   };
 
-  const toggleStatus = async (id, currentStatus) => {
+  const toggleStatus = async (e, id, newStatus) => {
+    e.stopPropagation();
     try {
-      const newStatus = currentStatus === 'pending' ? 'resolved' : 'pending';
-      await fetch(`${process.env.REACT_APP_API_URL}/api/complaints/${id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/complaints/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -99,6 +103,8 @@ const Complaints = () => {
               {filteredComplaints.map((complaint, index) => (
                 <tr 
                   key={complaint._id}
+                  onClick={() => setSelectedComplaint(complaint)}
+                  className="cursor-pointer hover:bg-blue-50"
                   style={{backgroundColor: index % 2 !== 0 ? '#1e3a8a1A' : 'white'}}
                 >
                   <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>
@@ -106,24 +112,28 @@ const Complaints = () => {
                   </td>
                   <td className="px-4 md:px-6 py-4 text-sm">{complaint.subject}</td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">
-                    <div className="max-w-xs truncate">{complaint.body}</div>
+                    <div className="max-w-xs">
+                      <div className="line-clamp-1">{complaint.body}</div>
+                    </div>
                   </td>
-                  <td className="px-4 md:px-6 py-4 text-sm">
-                    <button
-                      onClick={() => toggleStatus(complaint._id, complaint.status)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  <td className="px-4 md:px-6 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
+                    <select
+                      value={complaint.status}
+                      onChange={(e) => toggleStatus(e, complaint._id, e.target.value)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border-0 cursor-pointer ${
                         complaint.status === 'resolved'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-yellow-100 text-yellow-700'
                       }`}
                     >
-                      {complaint.status}
-                    </button>
+                      <option value="pending">Pending</option>
+                      <option value="resolved">Resolved</option>
+                    </select>
                   </td>
                   <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">
                     {new Date(complaint.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-4 md:px-6 py-4 text-sm">
+                  <td className="px-4 md:px-6 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                     <button 
                       onClick={() => setComplaintToDelete({ id: complaint._id, name: complaint.customerName })}
                       className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform"
@@ -149,6 +159,18 @@ const Complaints = () => {
         title="Delete Complaint"
         message={`Are you sure you want to delete this complaint from ${complaintToDelete?.name}?`}
       />
+
+      {selectedComplaint && (
+        <ComplaintModal
+          complaint={selectedComplaint}
+          onClose={() => {
+            setSelectedComplaint(null);
+          }}
+          onUpdate={() => {
+            loadComplaints();
+          }}
+        />
+      )}
     </div>
   );
 };

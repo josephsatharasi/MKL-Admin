@@ -35,9 +35,14 @@ router.post('/', async (req, res) => {
 // Update complaint status
 router.patch('/:id', async (req, res) => {
   try {
+    const updateData = {};
+    if (req.body.status) updateData.status = req.body.status;
+    if (req.body.subject) updateData.subject = req.body.subject;
+    if (req.body.body) updateData.body = req.body.body;
+    
     const complaint = await Complaint.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status },
+      updateData,
       { new: true }
     );
     res.json(complaint);
