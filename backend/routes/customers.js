@@ -37,11 +37,22 @@ router.get('/:id', async (req, res) => {
 
 // Create customer
 router.post('/', async (req, res) => {
+  console.log('Received customer data:', {
+    name: req.body.name,
+    hasProfilePic: !!req.body.profilePic,
+    additionalPicsCount: req.body.additionalPics?.length || 0
+  });
   const customer = new Customer(req.body);
   try {
     const newCustomer = await customer.save();
+    console.log('Saved customer:', {
+      id: newCustomer._id,
+      hasProfilePic: !!newCustomer.profilePic,
+      additionalPicsCount: newCustomer.additionalPics?.length || 0
+    });
     res.status(201).json(newCustomer);
   } catch (error) {
+    console.error('Error saving customer:', error.message);
     res.status(400).json({ message: error.message });
   }
 });

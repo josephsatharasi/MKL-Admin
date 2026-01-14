@@ -21,6 +21,7 @@ const NewServices = () => {
     spareParts: {
       'Sediment': false,
       'Carbon': false,
+      'Spun': false,
       'Tap': false,
       'Post/Carbon': false,
       'Membrane': false,
@@ -105,6 +106,7 @@ const NewServices = () => {
       spareParts: {
         'Sediment': false,
         'Carbon': false,
+        'Spun': false,
         'Tap': false,
         'Post/Carbon': false,
         'Membrane': false,

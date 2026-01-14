@@ -10,6 +10,7 @@ const AddCustomer = () => {
   const [savedCustomer, setSavedCustomer] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
+  const [additionalPics, setAdditionalPics] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [formData, setFormData] = useState({
     name: '',
@@ -44,19 +45,57 @@ const AddCustomer = () => {
       }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePic(reader.result);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 400;
+          const scale = maxWidth / img.width;
+          canvas.width = maxWidth;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          setProfilePic(compressed);
+        };
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!profilePic) {
-      toast.error('Please upload a profile picture');
+  const handleAdditionalPicsChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (additionalPics.length + files.length > 6) {
+      toast.error('Maximum 6 additional pictures allowed');
       return;
     }
+    files.forEach(file => {
+      if (file.size > 5000000) {
+        toast.error('File size should be less than 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 800;
+          const scale = maxWidth / img.width;
+          canvas.width = maxWidth;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          setAdditionalPics(prev => [...prev, compressed]);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
     if (formData.phone.length !== 10) {
       toast.error('Phone number must be exactly 10 digits!');
@@ -65,12 +104,11 @@ const AddCustomer = () => {
     
     try {
       const datePart = selectedDate.includes('T') ? selectedDate.split('T')[0] : selectedDate;
-      console.log('Selected Date:', selectedDate);
-      console.log('Date Part to save:', datePart);
-      const customerData = { ...formData, profilePic, serviceDate: datePart };
+      console.log('Sending to backend:', { profilePic: !!profilePic, additionalPics: additionalPics.length });
+      const customerData = { ...formData, profilePic, additionalPics, serviceDate: datePart };
       const newCustomer = await addCustomer(customerData);
-      console.log('Saved customer serviceDate:', newCustomer.serviceDate);
-      setSavedCustomer({ ...newCustomer, profilePic, serviceDate: datePart });
+      console.log('Received from backend:', newCustomer);
+      setSavedCustomer(newCustomer);
       toast.success(`${newCustomer.name} added successfully!`);
     } catch (error) {
       toast.error(error.message || 'Failed to add customer');
@@ -200,7 +238,7 @@ const AddCustomer = () => {
       
       <form onSubmit={handleSubmit} className="rounded-xl shadow-lg p-4 md:p-6 space-y-4 bg-white border border-gray-200">
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Profile Picture <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Profile Picture</label>
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center overflow-hidden bg-gray-50" style={{borderColor: '#1e3a8a'}}>
               {profilePic ? (
@@ -272,6 +310,35 @@ const AddCustomer = () => {
         </div>
 
         <div>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Additional Pictures (Max 6)</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleAdditionalPicsChange}
+            disabled={additionalPics.length >= 6}
+            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <p className="text-xs text-gray-500 mt-1">{additionalPics.length}/6 pictures uploaded</p>
+          {additionalPics.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              {additionalPics.map((pic, idx) => (
+                <div key={idx} className="relative">
+                  <img src={pic} alt={`Additional ${idx + 1}`} className="w-full h-24 object-cover rounded" />
+                  <button
+                    type="button"
+                    onClick={() => setAdditionalPics(prev => prev.filter((_, i) => i !== idx))}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Area <span className="text-red-500">*</span></label>
           <select
             name="area"
@@ -293,10 +360,17 @@ const AddCustomer = () => {
             <option value="Duvvada">Duvvada</option>
             <option value="Kancherapalem">Kancherapalem</option>
             <option value="RTC Complex">RTC Complex</option>
-            <option value="Madhurapalem">Madhurapalem</option>
+            <option value="Maddipalem">Maddipalem</option>
             <option value="Madhuruwada">Madhuruwada</option>
             <option value="Endada">Endada</option>
-            <option value="Anumanthwada">Anumanthwada</option>
+            <option value="Hnumanthwada">Hnumanthwada</option>
+            <option value="Akkayapalem">Akkayapalem</option>
+            <option value="PM Palem">PM Palem</option>
+            <option value="Allipuram">Allipuram</option>
+            <option value="Siripuram">Siripuram</option>
+            <option value="Shulanager">Shulanager</option>
+            <option value="Peddawaltair">Peddawaltair</option>
+            <option value="Chinnawaltair">Chinnawaltair</option>
           </select>
         </div>
 
@@ -310,6 +384,7 @@ const AddCustomer = () => {
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Next Reminder</option>
+            <option value="1">1 Month</option>
             <option value="3">3 Months</option>
             <option value="6">6 Months</option>
             <option value="12">12 Months</option>
@@ -377,6 +452,7 @@ const AddCustomer = () => {
                     brand: '',
                   });
                   setProfilePic(null);
+                  setAdditionalPics([]);
                   setSelectedDate(new Date().toISOString().slice(0, 10));
                 }}
                 className="flex items-center justify-center gap-2 px-6 text-white py-3 rounded-lg transition-colors font-semibold" style={{background: '#1e3a8a'}}

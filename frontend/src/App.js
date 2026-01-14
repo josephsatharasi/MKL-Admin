@@ -17,6 +17,8 @@ import Bin from './pages/Bin';
 import CurrentMonthCustomers from './pages/CurrentMonthCustomers';
 import ServiceSoon from './pages/ServiceSoon';
 import ServiceDelay from './pages/ServiceDelay';
+import Complaints from './pages/Complaints';
+import AddComplaint from './pages/AddComplaint';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -50,6 +52,8 @@ function App() {
                 <Route path="/new-services" element={<NewServices />} />
                 <Route path="/custom-invoice" element={<CustomInvoice />} />
                 <Route path="/bin" element={<Bin />} />
+                <Route path="/complaints" element={<Complaints />} />
+                <Route path="/add-complaint" element={<AddComplaint />} />
               </Routes>
             </Layout>
           ) : (

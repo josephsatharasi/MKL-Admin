@@ -75,9 +75,9 @@ const Customers = () => {
         </div>
       </div>
 
-      <div className="rounded-xl shadow-lg overflow-hidden bg-white">
-        <div className="overflow-x-auto overflow-y-auto" style={{maxHeight: '500px'}}>
-          <table className="w-full">
+      <div className="rounded-xl shadow-lg overflow-hidden bg-white mb-6">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
             <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
               <tr>
                 <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>

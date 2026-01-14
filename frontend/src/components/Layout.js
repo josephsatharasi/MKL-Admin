@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, UserPlus, AlertTriangle, Trash2, Menu, X, LogOut, FileText } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, AlertTriangle, Trash2, Menu, X, LogOut, FileText, MessageSquare } from 'lucide-react';
 import logo from '../assets/logo.JPG';
 import ConfirmModal from './ConfirmModal';
 
@@ -20,6 +20,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/add-customer', icon: UserPlus, label: 'Add Customer' },
     { path: '/admin/customers', icon: Users, label: 'All Customers' },
+    { path: '/admin/complaints', icon: MessageSquare, label: 'Complaints' },
     { path: '/admin/new-services', icon: AlertTriangle, label: 'New Services' },
     { path: '/admin/custom-invoice', icon: FileText, label: 'Custom Invoice' },
     { path: '/admin/bin', icon: Trash2, label: 'Bin' },
@@ -32,7 +33,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
         <div className="p-4 flex items-center justify-between border-b border-blue-400">
           {isSidebarOpen && (
             <Link to="/admin">
-              <img src={logo} alt="MKL" className="h-16 bg-white p-1 rounded" />
+              <img src={logo} alt="MKL" className="h-16 w-20 rounded border-2 border-white object-cover" />
             </Link>
           )}
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white" style={{opacity: 0.9}}>
@@ -91,7 +92,7 @@ const Layout = ({ children, setIsLoggedIn }) => {
           <div className="fixed left-0 top-0 h-full w-64 text-white z-50" style={{background: '#1e3a8a'}} onClick={(e) => e.stopPropagation()}>
             <div className="p-4 flex items-center justify-between" style={{borderBottom: '1px solid rgba(255,255,255,0.3)'}}>
               <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src={logo} alt="MKL" className="h-16 bg-white p-1 rounded" />
+                <img src={logo} alt="MKL" className="h-16 w-20 rounded border-2 border-white object-cover" />
               </Link>
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-white">
                 <X size={20} />

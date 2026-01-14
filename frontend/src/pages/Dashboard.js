@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, CheckCircle, AlertTriangle, XCircle, UserPlus } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, XCircle, UserPlus, FileText } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
 
 const Dashboard = () => {
@@ -85,6 +85,10 @@ const Dashboard = () => {
           <Link to="/admin/add-customer" className="flex items-center gap-2 w-full text-white py-3 px-4 rounded-lg transition-colors font-semibold shadow-md" style={{background: '#1e3a8a'}}>
             <UserPlus size={20} />
             Add New Customer
+          </Link>
+          <Link to="/admin/add-complaint" className="flex items-center gap-2 w-full bg-orange-500 text-white py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow-md">
+            <FileText size={20} />
+            Submit Complaint
           </Link>
           <Link to="/admin/new-services" className="flex items-center gap-2 w-full bg-yellow-500 text-white py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors font-semibold shadow-md">
             <AlertTriangle size={20} />

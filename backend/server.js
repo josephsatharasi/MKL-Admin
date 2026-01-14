@@ -10,13 +10,15 @@ connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/bin', require('./routes/bin'));
 app.use('/api/services', require('./routes/services'));
+app.use('/api/complaints', require('./routes/complaints'));
 
 // Health check
 app.get('/', (req, res) => {

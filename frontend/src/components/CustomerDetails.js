@@ -5,6 +5,9 @@ import { toast } from 'react-toastify';
 
 const CustomerDetails = ({ customer, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showPicsModal, setShowPicsModal] = useState(false);
+  console.log('Customer data:', customer);
+  console.log('Additional pics:', customer.additionalPics);
   const [formData, setFormData] = useState({
     name: customer.name || '',
     phone: customer.phone || '',
@@ -169,6 +172,21 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 <p className="font-semibold text-red-600">{formattedExpireDate}</p>
               </div>
             </div>
+
+            {customer.additionalPics && customer.additionalPics.length > 0 && (
+              <div className="flex items-start gap-3">
+                <Package className="mt-1" style={{color: '#1e3a8a'}} size={20} />
+                <div>
+                  <p className="text-sm text-gray-600">Additional Pictures</p>
+                  <button
+                    onClick={() => setShowPicsModal(true)}
+                    className="font-semibold text-blue-600 hover:underline"
+                  >
+                    View Pictures ({customer.additionalPics.length})
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex items-start gap-3">
@@ -188,6 +206,14 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
             <div className="text-sm text-gray-600">
               <p>Customer ID: #{customer._id || customer.id}</p>
               <p>Registered: {new Date(customer.createdAt).toLocaleDateString()}</p>
+              {customer.additionalPics && customer.additionalPics.length > 0 && (
+                <button
+                  onClick={() => setShowPicsModal(true)}
+                  className="mt-2 text-blue-600 hover:underline font-semibold"
+                >
+                  View Photos ({customer.additionalPics.length})
+                </button>
+              )}
             </div>
           </div>
 
@@ -203,6 +229,24 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
           )}
         </div>
       </div>
+
+      {showPicsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setShowPicsModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="text-white p-4 md:p-6 flex justify-between items-center" style={{background: '#1e3a8a'}}>
+              <h2 className="text-xl md:text-2xl font-bold">Additional Pictures</h2>
+              <button onClick={() => setShowPicsModal(false)} className="p-2 rounded-lg transition-colors" style={{backgroundColor: 'rgba(62, 164, 240, 0.2)'}}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {customer.additionalPics.map((pic, idx) => (
+                <img key={idx} src={pic} alt={`Additional ${idx + 1}`} className="w-full h-48 object-contain rounded border-2 border-blue-200 bg-gray-50" />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
