@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getCustomers } from '../utils/storage';
-import { toast } from 'react-toastify';
 
 const ServiceSoon = () => {
   const [customers, setCustomers] = useState([]);
@@ -53,11 +52,9 @@ const ServiceSoon = () => {
         });
       }
       
-      toast.success('Status updated!');
       loadCustomers();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Failed to update status');
     }
   };
 

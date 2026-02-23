@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { X, Edit2, Save } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 const ComplaintModal = ({ complaint, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -34,12 +33,11 @@ const ComplaintModal = ({ complaint, onClose, onUpdate }) => {
       if (!response.ok) throw new Error('Failed to update');
 
       await response.json();
-      toast.success('Complaint updated successfully!');
       setIsEditing(false);
       await onUpdate();
       onClose();
     } catch (error) {
-      toast.error('Failed to update complaint');
+      console.error('Failed to update complaint');
     }
   };
 

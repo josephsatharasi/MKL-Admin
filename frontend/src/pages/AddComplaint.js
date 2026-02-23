@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { FileText, AlertCircle, CheckCircle } from 'lucide-react';
 
 const AddComplaint = () => {
@@ -79,7 +78,6 @@ const AddComplaint = () => {
     );
     
     if (!isValid) {
-      toast.error('Please select a valid customer from the list');
       return;
     }
 
@@ -98,10 +96,9 @@ const AddComplaint = () => {
         throw new Error(data.message || 'Failed to submit complaint');
       }
 
-      toast.success('Complaint submitted successfully!');
       navigate('/admin/complaints');
     } catch (error) {
-      toast.error(error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }

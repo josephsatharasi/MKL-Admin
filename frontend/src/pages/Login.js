@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
-import { toast } from 'react-toastify';
 import logo from '../assets/logo.JPG';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -15,7 +14,6 @@ const Login = ({ setIsLoggedIn }) => {
     e.preventDefault();
     
     if (!credentials.email || !credentials.password) {
-      toast.error('Please enter email and password');
       return;
     }
 
@@ -33,13 +31,12 @@ const Login = ({ setIsLoggedIn }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setIsLoggedIn(true);
-        toast.success('Login successful');
         navigate('/admin');
       } else {
-        toast.error(data.message || 'Login failed');
+        console.error(data.message || 'Login failed');
       }
     } catch (error) {
-      toast.error('Server error. Please try again.');
+      console.error('Server error. Please try again.');
     } finally {
       setLoading(false);
     }

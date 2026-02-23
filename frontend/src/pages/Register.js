@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
-import { toast } from 'react-toastify';
 import logo from '../assets/logo.JPG';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -15,12 +14,10 @@ const Register = () => {
     e.preventDefault();
     
     if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      toast.error('Please fill all fields');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
       return;
     }
 
@@ -35,13 +32,12 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Registration successful! Please login.');
         navigate('/');
       } else {
-        toast.error(data.message || 'Registration failed');
+        console.error(data.message || 'Registration failed');
       }
     } catch (error) {
-      toast.error('Server error. Please try again.');
+      console.error('Server error. Please try again.');
     } finally {
       setLoading(false);
     }

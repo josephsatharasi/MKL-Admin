@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Search, FileText } from 'lucide-react';
-import { toast } from 'react-toastify';
 import ConfirmModal from '../components/ConfirmModal';
 import ComplaintModal from '../components/ComplaintModal';
 
@@ -23,7 +22,7 @@ const Complaints = () => {
       const data = await response.json();
       setComplaints(data);
     } catch (error) {
-      toast.error('Failed to load complaints');
+      console.error('Failed to load complaints');
     }
   };
 
@@ -33,9 +32,8 @@ const Complaints = () => {
         method: 'DELETE'
       });
       loadComplaints();
-      toast.success('Complaint deleted successfully!');
     } catch (error) {
-      toast.error('Failed to delete complaint');
+      console.error('Failed to delete complaint');
     }
   };
 
@@ -48,9 +46,8 @@ const Complaints = () => {
         body: JSON.stringify({ status: newStatus })
       });
       loadComplaints();
-      toast.success(`Complaint marked as ${newStatus}`);
     } catch (error) {
-      toast.error('Failed to update status');
+      console.error('Failed to update status');
     }
   };
 

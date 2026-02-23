@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Upload, Save, Download, Plus } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
-import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 
 const NewServices = () => {
@@ -153,7 +152,6 @@ const NewServices = () => {
 
   const handleSaveService = async () => {
     if (!serviceData.totalBill) {
-      toast.error('Please enter total bill amount');
       return;
     }
     
@@ -193,9 +191,9 @@ const NewServices = () => {
         });
         
         if (updateResponse.ok) {
-          toast.success('Service saved and expiry date updated!');
+          console.log('Service saved and expiry date updated!');
         } else {
-          toast.success('Service saved successfully!');
+          console.log('Service saved successfully!');
         }
         
         await loadServices(selectedCustomer._id);
@@ -203,7 +201,6 @@ const NewServices = () => {
       }
     } catch (error) {
       console.error('Save error:', error);
-      toast.error('Failed to save service');
     }
   };
 
@@ -216,10 +213,8 @@ const NewServices = () => {
       });
       const updatedCustomers = await getCustomers();
       setCustomers(updatedCustomers);
-      toast.success('Status updated!');
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error('Failed to update status');
     }
   };
 
@@ -328,7 +323,6 @@ const NewServices = () => {
     doc.text('For support: Contact 8179019929', pageWidth / 2, yPos + 17, { align: 'center' });
     
     doc.save(`Service_Receipt_${selectedCustomer.name}_${Date.now()}.pdf`);
-    toast.success('Invoice downloaded!');
   };
 
   return (

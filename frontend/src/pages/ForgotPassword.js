@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail } from 'lucide-react';
-import { toast } from 'react-toastify';
 import logo from '../assets/logo.JPG';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -15,7 +14,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     
     if (!email) {
-      toast.error('Please enter your email');
       return;
     }
 
@@ -30,15 +28,13 @@ const ForgotPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Reset link sent to your email');
         setEmail('');
         setResetLink('');
       } else {
-        toast.error(data.message || 'Failed to send reset link');
+        console.error(data.message || 'Failed to send reset link');
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Server error. Please try again.');
     } finally {
       setLoading(false);
     }

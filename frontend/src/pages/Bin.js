@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, RotateCcw, X } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 const API_URL = 'https://mkl-admin-backend.onrender.com/api';
 
@@ -27,11 +26,10 @@ const Bin = () => {
         method: 'POST',
       });
       if (response.ok) {
-        toast.success(`${name} restored successfully!`);
         loadDeletedCustomers();
       }
     } catch (error) {
-      toast.error('Failed to restore customer');
+      console.error('Failed to restore customer');
     }
   };
 
@@ -41,11 +39,10 @@ const Bin = () => {
         method: 'DELETE',
       });
       if (response.ok) {
-        toast.success(`${name} permanently deleted`);
         loadDeletedCustomers();
       }
     } catch (error) {
-      toast.error('Failed to delete customer');
+      console.error('Failed to delete customer');
     }
   };
 

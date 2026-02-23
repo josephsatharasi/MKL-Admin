@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Search, Eye } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { getCustomers, deleteCustomer } from '../utils/storage';
 import CustomerDetails from '../components/CustomerDetails';
 import ConfirmModal from '../components/ConfirmModal';
@@ -25,7 +24,6 @@ const Customers = () => {
   const handleDelete = async () => {
     await deleteCustomer(customerToDelete.id);
     loadCustomers();
-    toast.success(`${customerToDelete.name} deleted successfully!`);
   };
 
 

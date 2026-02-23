@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { X, User, Phone, Mail, MapPin, Package, Calendar, Edit2 } from 'lucide-react';
+import { X, User, Phone, Mail, MapPin, Package, Calendar, Edit2, Download } from 'lucide-react';
 import { updateCustomer } from '../utils/storage';
-import { toast } from 'react-toastify';
 
 const CustomerDetails = ({ customer, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPicsModal, setShowPicsModal] = useState(false);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
   console.log('Customer data:', customer);
   console.log('Additional pics:', customer.additionalPics);
   const [formData, setFormData] = useState({
@@ -25,12 +25,11 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
   const handleSave = async () => {
     try {
       await updateCustomer(customer._id || customer.id, formData);
-      toast.success('Customer updated successfully!');
       setIsEditing(false);
       if (onUpdate) onUpdate();
       onClose();
     } catch (error) {
-      toast.error('Failed to update customer');
+      console.error('Failed to update customer');
     }
   };
 
@@ -241,9 +240,33 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
             </div>
             <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {customer.additionalPics.map((pic, idx) => (
-                <img key={idx} src={pic} alt={`Additional ${idx + 1}`} className="w-full h-48 object-contain rounded border-2 border-blue-200 bg-gray-50" />
+                <div key={idx} className="relative group cursor-pointer" onClick={() => setFullScreenImage(pic)}>
+                  <img src={pic} alt={`Additional ${idx + 1}`} className="w-full h-48 object-contain rounded border-2 border-blue-200 bg-gray-50" />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded flex items-center justify-center">
+                    <span className="text-white opacity-0 group-hover:opacity-100 font-semibold">Click to view</span>
+                  </div>
+                </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {fullScreenImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-[60] flex items-center justify-center p-4" onClick={() => setFullScreenImage(null)}>
+          <img src={fullScreenImage} alt="Full screen" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+          <div className="absolute top-4 right-4 flex gap-2">
+            <a 
+              href={fullScreenImage} 
+              download={`customer-${customer.name}-image-${Date.now()}.jpg`}
+              className="text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 p-2 rounded"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Download size={24} />
+            </a>
+            <button onClick={() => setFullScreenImage(null)} className="text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 p-2 rounded">
+              <X size={24} />
+            </button>
           </div>
         </div>
       )}

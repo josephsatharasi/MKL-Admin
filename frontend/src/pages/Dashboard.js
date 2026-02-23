@@ -21,27 +21,37 @@ const Dashboard = () => {
       
       let expiringSoon = 0;
       let expired = 0;
+      let serviceCustomers = 0;
       
       customers.forEach(customer => {
+        // Count customers who have taken a service (service field must be a valid number > 0)
+        const serviceValue = customer.service ? parseInt(customer.service) : 0;
+        if (serviceValue > 0) {
+          serviceCustomers++;
+        }
+        
         if (customer.followUpStatus === 'completed') return;
         
-        const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
-        const expireDate = new Date(serviceDate);
-        expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
-        expireDate.setHours(0, 0, 0, 0);
-        
-        const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
-        
-        if (daysUntilExpiry < 0) {
-          expired++;
-        } else if (daysUntilExpiry <= 7) {
-          expiringSoon++;
+        // Only calculate expiry for customers with service
+        if (serviceValue > 0) {
+          const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
+          const expireDate = new Date(serviceDate);
+          expireDate.setMonth(expireDate.getMonth() + serviceValue);
+          expireDate.setHours(0, 0, 0, 0);
+          
+          const daysUntilExpiry = Math.floor((expireDate - today) / (1000 * 60 * 60 * 24));
+          
+          if (daysUntilExpiry < 0) {
+            expired++;
+          } else if (daysUntilExpiry <= 7) {
+            expiringSoon++;
+          }
         }
       });
       
       setStats({
         total: customers.length,
-        active: customers.length,
+        active: serviceCustomers,
         expiringSoon,
         expired,
       });

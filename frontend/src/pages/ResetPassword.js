@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock } from 'lucide-react';
-import { toast } from 'react-toastify';
 import logo from '../assets/logo.JPG';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -17,12 +16,10 @@ const ResetPassword = () => {
     e.preventDefault();
     
     if (!formData.password || !formData.confirmPassword) {
-      toast.error('Please fill all fields');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
       return;
     }
 
@@ -37,13 +34,12 @@ const ResetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Password reset successful! Please login.');
         navigate('/');
       } else {
-        toast.error(data.message || 'Failed to reset password');
+        console.error(data.message || 'Failed to reset password');
       }
     } catch (error) {
-      toast.error('Server error. Please try again.');
+      console.error('Server error. Please try again.');
     } finally {
       setLoading(false);
     }

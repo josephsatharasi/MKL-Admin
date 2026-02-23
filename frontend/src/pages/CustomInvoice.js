@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Download } from 'lucide-react';
-import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 
 const CustomInvoice = () => {
@@ -56,7 +55,6 @@ const CustomInvoice = () => {
 
   const generateInvoice = () => {
     if (!formData.name || !formData.phone || !formData.brand) {
-      toast.error('Please fill required fields!');
       return;
     }
 
@@ -189,7 +187,34 @@ const CustomInvoice = () => {
     doc.text('For support: Contact 8179019929', pageWidth / 2, 277, { align: 'center' });
     
     doc.save(`Custom_Invoice_${formData.name}_${Date.now()}.pdf`);
-    toast.success('Invoice downloaded!');
+    
+    // Clear form after generating invoice
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      address: '',
+      brand: '',
+      amount: '',
+      paymentMode: 'Cash',
+      notes: '',
+      spareParts: {
+        'Sediment': false,
+        'Carbon': false,
+        'Spun': false,
+        'Tap': false,
+        'Post/Carbon': false,
+        'Membrane': false,
+        'Membrane Housing': false,
+        'SV': false,
+        'Pump': false,
+        'SMPS': false,
+        'Float': false,
+        'Diveter Wall': false,
+        'Pipe': false
+      },
+      images: []
+    });
   };
 
   return (

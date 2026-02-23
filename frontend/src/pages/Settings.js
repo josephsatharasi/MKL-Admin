@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Bell, Mail, Shield, Plus, Trash2 } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { getPartners, addPartner, deletePartner } from '../utils/partners';
 
 const Settings = () => {
@@ -25,7 +24,7 @@ const Settings = () => {
   };
 
   const handleSave = () => {
-    toast.success('Settings saved successfully!');
+    console.log('Settings saved successfully!');
   };
 
   const handleAddPartner = (e) => {
@@ -34,7 +33,6 @@ const Settings = () => {
       addPartner({ ...newPartner, price3Months: parseFloat(newPartner.price3Months) });
       setNewPartner({ name: '', price3Months: '' });
       loadPartners();
-      toast.success(`${newPartner.name} added successfully!`);
     }
   };
 
@@ -42,7 +40,6 @@ const Settings = () => {
     if (window.confirm(`Delete ${name}?`)) {
       deletePartner(id);
       loadPartners();
-      toast.success(`${name} deleted!`);
     }
   };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, X, Download, Upload, User, Calendar } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { addCustomer } from '../utils/storage';
 import jsPDF from 'jspdf';
 
@@ -40,7 +39,6 @@ const AddCustomer = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5000000) {
-        toast.error('File size should be less than 5MB');
         return;
       }
       const reader = new FileReader();
@@ -66,12 +64,10 @@ const AddCustomer = () => {
   const handleAdditionalPicsChange = (e) => {
     const files = Array.from(e.target.files);
     if (additionalPics.length + files.length > 6) {
-      toast.error('Maximum 6 additional pictures allowed');
       return;
     }
     files.forEach(file => {
       if (file.size > 5000000) {
-        toast.error('File size should be less than 5MB');
         return;
       }
       const reader = new FileReader();
@@ -98,7 +94,6 @@ const AddCustomer = () => {
     e.preventDefault();
     
     if (formData.phone.length !== 10) {
-      toast.error('Phone number must be exactly 10 digits!');
       return;
     }
     
@@ -109,9 +104,22 @@ const AddCustomer = () => {
       const newCustomer = await addCustomer(customerData);
       console.log('Received from backend:', newCustomer);
       setSavedCustomer(newCustomer);
-      toast.success(`${newCustomer.name} added successfully!`);
+      
+      // Clear form immediately after successful submission
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        area: '',
+        service: '',
+        brand: '',
+      });
+      setProfilePic(null);
+      setAdditionalPics([]);
+      setSelectedDate(new Date().toISOString().slice(0, 10));
     } catch (error) {
-      toast.error(error.message || 'Failed to add customer');
+      console.error(error.message || 'Failed to add customer');
     }
   };
 
@@ -229,7 +237,6 @@ const AddCustomer = () => {
     doc.text('For support: Contact 8179019929', pageWidth / 2, 277, { align: 'center' });
     
     doc.save(`Service_Invoice_${savedCustomer.name}_${Date.now()}.pdf`);
-    toast.success('Invoice downloaded!');
   };
 
   return (
@@ -349,41 +356,40 @@ const AddCustomer = () => {
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-auto"
           >
             <option value="">Select Area</option>
-            <option value="Pendurthi">Pendurthi</option>
-            <option value="Kothavalasa">Kothavalasa</option>
+            <option value="Akkayapalem">Akkayapalem</option>
+            <option value="Allipuram">Allipuram</option>
             <option value="Anakapelly">Anakapelly</option>
             <option value="Chinna Musaliwada">Chinna Musaliwada</option>
-            <option value="NAD Junction">NAD Junction</option>
-            <option value="Marripalem">Marripalem</option>
-            <option value="Gajuwaka">Gajuwaka</option>
-            <option value="Koramanapalem">Koramanapalem</option>
+            <option value="Chinnawaltair">Chinnawaltair</option>
             <option value="Duvvada">Duvvada</option>
+            <option value="Endada">Endada</option>
+            <option value="Gajuwaka">Gajuwaka</option>
+            <option value="Hnumanthwada">Hnumanthwada</option>
             <option value="Kancherapalem">Kancherapalem</option>
-            <option value="RTC Complex">RTC Complex</option>
+            <option value="Koramanapalem">Koramanapalem</option>
+            <option value="Kothavalasa">Kothavalasa</option>
             <option value="Maddipalem">Maddipalem</option>
             <option value="Madhuruwada">Madhuruwada</option>
-            <option value="Endada">Endada</option>
-            <option value="Hnumanthwada">Hnumanthwada</option>
-            <option value="Akkayapalem">Akkayapalem</option>
-            <option value="PM Palem">PM Palem</option>
-            <option value="Allipuram">Allipuram</option>
-            <option value="Siripuram">Siripuram</option>
-            <option value="Shulanager">Shulanager</option>
+            <option value="Marripalem">Marripalem</option>
+            <option value="NAD Junction">NAD Junction</option>
             <option value="Peddawaltair">Peddawaltair</option>
-            <option value="Chinnawaltair">Chinnawaltair</option>
+            <option value="Pendurthi">Pendurthi</option>
+            <option value="PM Palem">PM Palem</option>
+            <option value="RTC Complex">RTC Complex</option>
+            <option value="Shulanager">Shulanager</option>
+            <option value="Siripuram">Siripuram</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Next Reminder <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Next Reminder</label>
           <select
             name="service"
             value={formData.service}
             onChange={handleChange}
-            required
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">Select Next Reminder</option>
+            <option value="">Select Next Reminder (Optional)</option>
             <option value="1">1 Month</option>
             <option value="3">3 Months</option>
             <option value="6">6 Months</option>
