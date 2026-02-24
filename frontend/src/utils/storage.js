@@ -1,8 +1,11 @@
-const API_URL = 'https://mkl-admin-backend.onrender.com/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://mkl-admin-backend.onrender.com/api';
 
-export const getCustomers = async () => {
+export const getCustomers = async (excludeImages = true) => {
   try {
-    const response = await fetch(`${API_URL}/customers`);
+    const url = excludeImages 
+      ? `${API_URL}/customers?excludeImages=true` 
+      : `${API_URL}/customers`;
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch customers');
     return response.json();
   } catch (error) {

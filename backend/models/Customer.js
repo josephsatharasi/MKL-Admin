@@ -15,4 +15,12 @@ const customerSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Add indexes for faster queries
+customerSchema.index({ name: 1 });
+customerSchema.index({ phone: 1 });
+customerSchema.index({ area: 1 });
+customerSchema.index({ service: 1 });
+customerSchema.index({ followUpStatus: 1 });
+customerSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Customer', customerSchema);
