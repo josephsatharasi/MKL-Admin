@@ -26,6 +26,10 @@ const Dashboard = () => {
       customers.forEach(customer => {
         // Count customers who have taken a service (service field must be a valid number > 0)
         const serviceValue = customer.service ? parseInt(customer.service) : 0;
+        
+        // Debug: Log customer service values
+        console.log(`Customer: ${customer.name}, Service: "${customer.service}", Parsed: ${serviceValue}`);
+        
         if (serviceValue > 0) {
           serviceCustomers++;
         }
@@ -48,6 +52,8 @@ const Dashboard = () => {
           }
         }
       });
+      
+      console.log(`Total Customers: ${customers.length}, Service Customers: ${serviceCustomers}`);
       
       setStats({
         total: customers.length,

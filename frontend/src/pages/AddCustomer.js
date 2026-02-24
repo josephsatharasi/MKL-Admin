@@ -407,15 +407,15 @@ const AddCustomer = () => {
             className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Brand</option>
-            <option value="Prolife">Prolife</option>
-            <option value="Kent">Kent</option>
-            <option value="Merlin">Merlin</option>
-            <option value="Softner">Softner</option>
-            <option value="IRO-plant">IRO-plant</option>
-            <option value="Bpure">Bpure</option>
             <option value="Aquaguard">Aquaguard</option>
-            <option value="Local">Local</option>
+            <option value="Bpure">Bpure</option>
             <option value="Flipkart">Flipkart</option>
+            <option value="IRO-plant">IRO-plant</option>
+            <option value="Kent">Kent</option>
+            <option value="Local">Local</option>
+            <option value="Merlin">Merlin</option>
+            <option value="Prolife">Prolife</option>
+            <option value="Softner">Softner</option>
           </select>
         </div>
 
