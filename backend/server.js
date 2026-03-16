@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const connectDB = require('./config/db');
 
 const app = express();
@@ -9,7 +10,12 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(compression()); // Enable GZIP compression
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

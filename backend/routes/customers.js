@@ -5,7 +5,17 @@ const Customer = require('../models/Customer');
 // Get all customers
 router.get('/', async (req, res) => {
   try {
-    const customers = await Customer.find().sort({ createdAt: -1 });
+    // Option to exclude images for faster loading
+    const excludeImages = req.query.excludeImages === 'true';
+    
+    const selectFields = excludeImages 
+      ? '-profilePic -additionalPics -__v' 
+      : '-__v';
+    
+    const customers = await Customer.find()
+      .select(selectFields) // Exclude images if requested
+      .sort({ createdAt: -1 })
+      .lean(); // Convert to plain JavaScript objects for better performance
     res.json(customers);
   } catch (error) {
     res.status(500).json({ message: error.message });
