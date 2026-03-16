@@ -3,6 +3,7 @@ import { Trash2, Search, Eye } from 'lucide-react';
 import { getCustomers, deleteCustomer } from '../utils/storage';
 import CustomerDetails from '../components/CustomerDetails';
 import ConfirmModal from '../components/ConfirmModal';
+import Table from '../components/Table';
 import { useSearchParams } from 'react-router-dom';
 
 const Customers = () => {
@@ -30,8 +31,7 @@ const Customers = () => {
   const filteredCustomers = customers.filter(c => {
     const matchesSearch = 
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.phone.includes(searchTerm) ||
-      (c.email && c.email.toLowerCase().includes(searchTerm.toLowerCase()));
+      c.phone.includes(searchTerm);
     
     if (searchParams.get('filter') === 'expired') {
       const parseDate = (dateStr) => {
@@ -65,7 +65,7 @@ const Customers = () => {
           <Search className="absolute left-3 top-3 text-primary" size={20} />
           <input
             type="text"
-            placeholder="Search by name, phone, or email..."
+            placeholder="Search by name or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white border-2 border-primary/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm"
@@ -73,70 +73,45 @@ const Customers = () => {
         </div>
       </div>
 
-      <div className="rounded-xl shadow-lg overflow-hidden bg-white mb-6">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-full">
-            <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
-              <tr>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Phone</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm hidden md:table-cell">Email</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Area</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Brand</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Next Remainder</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCustomers.map((customer, index) => (
-                <tr 
-                  key={customer.id} 
-                  className="cursor-pointer"
-                  style={{backgroundColor: index % 2 !== 0 ? '#1e3a8a1A' : 'white'}}
-                  onClick={() => setSelectedCustomer(customer)}
-                >
-                  <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{customer.name}</td>
-                  <td className="px-4 md:px-6 py-4 text-sm">{customer.phone}</td>
-                  <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">{customer.email}</td>
-                  <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">
-                    <span className="px-2 py-1 rounded text-xs font-semibold" style={{backgroundColor: '#1e3a8a' + '33', color: '#1e3a8a'}}>{customer.area}</span>
-                  </td>
-                  <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">{customer.brand}</td>
-                  <td className="px-4 md:px-6 py-4 text-sm">{customer.service}M</td>
-                  <td className="px-4 md:px-6 py-4 text-sm">
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedCustomer(customer);
-                        }} 
-                        className="hover:scale-110 transition-transform"
-                        style={{color: '#1e3a8a'}}
-                        title="View Details"
-                      >
-                        <Eye size={18} />
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCustomerToDelete({ id: customer._id || customer.id, name: customer.name });
-                        }} 
-                        className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform"
-                        title="Delete Customer"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredCustomers.length === 0 && (
-          <div className="text-center py-8 text-gray-500">No customers found</div>
-        )}
-      </div>
+      <Table
+        columns={[
+          { header: 'Name', field: 'name', bold: true, color: '#1e3a8a' },
+          { header: 'Phone', field: 'phone' },
+          { header: 'Area', hideOnTablet: true, render: (customer) => (
+            <span className="px-2 py-1 rounded text-xs font-semibold" style={{backgroundColor: '#1e3a8a33', color: '#1e3a8a'}}>{customer.area}</span>
+          )},
+          { header: 'Brand', field: 'brand', hideOnTablet: true },
+          { header: 'Next Remainder', render: (customer) => `${customer.service}M` },
+          { header: 'Actions', stopPropagation: true, render: (customer) => (
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedCustomer(customer);
+                }} 
+                className="hover:scale-110 transition-transform"
+                style={{color: '#1e3a8a'}}
+                title="View Details"
+              >
+                <Eye size={18} />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCustomerToDelete({ id: customer._id || customer.id, name: customer.name });
+                }} 
+                className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform"
+                title="Delete Customer"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          )}
+        ]}
+        data={filteredCustomers}
+        onRowClick={setSelectedCustomer}
+        emptyMessage="No customers found"
+      />
 
       {selectedCustomer && (
         <CustomerDetails customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} onUpdate={loadCustomers} />

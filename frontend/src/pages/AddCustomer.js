@@ -14,7 +14,6 @@ const AddCustomer = () => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    email: '',
     address: '',
     area: '',
     service: '',
@@ -109,7 +108,6 @@ const AddCustomer = () => {
       setFormData({
         name: '',
         phone: '',
-        email: '',
         address: '',
         area: '',
         service: '',
@@ -173,11 +171,10 @@ const AddCustomer = () => {
     doc.setFont(undefined, 'normal');
     doc.text(`Name: ${savedCustomer.name}`, 20, 103);
     doc.text(`Phone: +91 ${savedCustomer.phone}`, 20, 111);
-    doc.text(`Email: ${savedCustomer.email}`, 20, 119);
     
     // Address with larger font
     const addressLines = doc.splitTextToSize(`Address: ${savedCustomer.address}`, pageWidth - 40);
-    let addressY = 127;
+    let addressY = 119;
     addressLines.forEach(line => {
       doc.text(line, 20, addressY);
       addressY += 7;
@@ -292,18 +289,6 @@ const AddCustomer = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="customer@email.com"
-          />
-        </div>
-
-        <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Address <span className="text-red-500">*</span></label>
           <textarea
             name="address"
@@ -359,25 +344,41 @@ const AddCustomer = () => {
             <option value="Akkayapalem">Akkayapalem</option>
             <option value="Allipuram">Allipuram</option>
             <option value="Anakapelly">Anakapelly</option>
+            <option value="Birla Junction">Birla Junction</option>
+            <option value="Bujjirajupalem">Bujjirajupalem</option>
             <option value="Chinna Musaliwada">Chinna Musaliwada</option>
             <option value="Chinnawaltair">Chinnawaltair</option>
+            <option value="Chodavaram">Chodavaram</option>
+            <option value="Dabagardens">Dabagardens</option>
             <option value="Duvvada">Duvvada</option>
+            <option value="Dwarakanagar">Dwarakanagar</option>
             <option value="Endada">Endada</option>
             <option value="Gajuwaka">Gajuwaka</option>
-            <option value="Hnumanthwada">Hnumanthwada</option>
+            <option value="Gopalapatnam">Gopalapatnam</option>
+            <option value="Hanumanthwada">Hanumanthwada</option>
             <option value="Kancherapalem">Kancherapalem</option>
             <option value="Koramanapalem">Koramanapalem</option>
             <option value="Kothavalasa">Kothavalasa</option>
             <option value="Maddipalem">Maddipalem</option>
             <option value="Madhuruwada">Madhuruwada</option>
+            <option value="Malkapuram">Malkapuram</option>
             <option value="Marripalem">Marripalem</option>
+            <option value="MVP Colony">MVP Colony</option>
             <option value="NAD Junction">NAD Junction</option>
+            <option value="Naiduthota">Naiduthota</option>
             <option value="Peddawaltair">Peddawaltair</option>
             <option value="Pendurthi">Pendurthi</option>
             <option value="PM Palem">PM Palem</option>
+            <option value="Poorana Market">Poorana Market</option>
             <option value="RTC Complex">RTC Complex</option>
+            <option value="Sabbavaram">Sabbavaram</option>
+            <option value="Sheelanagar">Sheelanagar</option>
             <option value="Shulanager">Shulanager</option>
             <option value="Siripuram">Siripuram</option>
+            <option value="Skota">Skota</option>
+            <option value="Sriharipuram">Sriharipuram</option>
+            <option value="Sujathanagar">Sujathanagar</option>
+            <option value="Vepagunta">Vepagunta</option>
           </select>
         </div>
 
@@ -451,7 +452,6 @@ const AddCustomer = () => {
                   setFormData({
                     name: '',
                     phone: '',
-                    email: '',
                     address: '',
                     area: '',
                     service: '',

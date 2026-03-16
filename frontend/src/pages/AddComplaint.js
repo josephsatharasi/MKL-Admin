@@ -51,7 +51,8 @@ const AddComplaint = () => {
     }
 
     const matches = customers.filter(c => 
-      c.name.toLowerCase().includes(value.toLowerCase())
+      c.name.toLowerCase().includes(value.toLowerCase()) ||
+      c.phone.includes(value)
     );
     
     setFilteredCustomers(matches);
@@ -125,7 +126,7 @@ const AddComplaint = () => {
                   customerExists === false ? 'border-red-500' : 
                   customerExists === true ? 'border-green-500' : 'border-gray-300'
                 }`}
-                placeholder="Start typing customer name..."
+                placeholder="Start typing customer name or phone number..."
                 autoComplete="off"
               />
               {customerExists === true && (

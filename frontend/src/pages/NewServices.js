@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Upload, Save, Download, Plus } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
+import Table from '../components/Table';
 import jsPDF from 'jspdf';
 
 const NewServices = () => {

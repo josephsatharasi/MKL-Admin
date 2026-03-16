@@ -8,7 +8,8 @@ router.get('/', async (req, res) => {
     const services = await Service.find().sort({ serviceDate: -1 });
     res.json(services);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching services:', error);
+    res.status(500).json({ message: error.message, error: error.toString() });
   }
 });
 
@@ -18,7 +19,8 @@ router.get('/customer/:customerId', async (req, res) => {
     const services = await Service.find({ customerId: req.params.customerId }).sort({ serviceDate: -1 });
     res.json(services);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching customer services:', error);
+    res.status(500).json({ message: error.message, error: error.toString() });
   }
 });
 

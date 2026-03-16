@@ -25,7 +25,6 @@ router.post('/restore/:id', async (req, res) => {
     const restoredCustomer = new Customer({
       name: deletedCustomer.name,
       phone: deletedCustomer.phone,
-      email: deletedCustomer.email,
       address: deletedCustomer.address,
       area: deletedCustomer.area,
       service: deletedCustomer.service,

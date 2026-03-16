@@ -100,7 +100,6 @@ router.delete('/:id', async (req, res) => {
     const deletedCustomer = new DeletedCustomer({
       name: customer.name,
       phone: customer.phone,
-      email: customer.email,
       address: customer.address,
       area: customer.area,
       service: customer.service,

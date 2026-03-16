@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const deletedCustomerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String, required: true },
-  email: String,
   address: String,
   area: String,
   service: String,

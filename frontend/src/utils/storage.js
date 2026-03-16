@@ -1,4 +1,4 @@
-const API_URL = 'https://mkl-admin-backend.onrender.com/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://mkl-admin-backend.onrender.com/api';
 
 export const getCustomers = async () => {
   try {

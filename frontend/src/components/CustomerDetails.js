@@ -11,7 +11,6 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     name: customer.name || '',
     phone: customer.phone || '',
-    email: customer.email || '',
     address: customer.address || '',
     area: customer.area || '',
     brand: customer.brand || '',
@@ -97,18 +96,6 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                   <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
                   <p className="font-semibold text-blue-900">{customer.phone}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Mail className="mt-1" style={{color: '#1e3a8a'}} size={20} />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600">Email</p>
-                {isEditing ? (
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
-                ) : (
-                  <p className="font-semibold text-blue-900">{customer.email}</p>
                 )}
               </div>
             </div>
