@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Upload, Save, Download, Plus } from 'lucide-react';
+import { Search, X, Upload, Save, Download, Plus, Edit2, Trash2 } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
 import Table from '../components/Table';
 import jsPDF from 'jspdf';
@@ -132,6 +132,44 @@ const NewServices = () => {
     setShowAddService(true);
   };
 
+  const handleEditService = (service, e) => {
+    e.stopPropagation();
+    console.log('Editing service:', service);
+    setSelectedService(service);
+    setServiceData({
+      spareParts: service.spareParts,
+      images: service.images || [],
+      totalBill: service.totalBill,
+      paymentMode: service.paymentMode,
+      serviceDate: service.serviceDate,
+      reminderMonths: service.reminderMonths?.toString() || '3'
+    });
+    setShowAddService(true);
+  };
+
+  const handleDeleteService = async (serviceId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this service record?')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`https://mkl-admin-backend.onrender.com/api/services/${serviceId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        console.log('Service deleted successfully');
+        await loadServices(selectedCustomer._id);
+        await loadAllServiceDates(customers);
+      } else {
+        console.error('Failed to delete service');
+      }
+    } catch (error) {
+      console.error('Error deleting service:', error);
+    }
+  };
+
   const handleCheckboxChange = (part) => {
     setServiceData(prev => ({
       ...prev,
@@ -170,16 +208,23 @@ const NewServices = () => {
       
       console.log('Saving service with date:', serviceRecord.serviceDate);
       
-      const response = await fetch('https://mkl-admin-backend.onrender.com/api/services', {
-        method: 'POST',
+      // Check if we're editing an existing service
+      const isEditing = selectedService && selectedService._id;
+      const url = isEditing 
+        ? `https://mkl-admin-backend.onrender.com/api/services/${selectedService._id}`
+        : 'https://mkl-admin-backend.onrender.com/api/services';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(serviceRecord)
       });
       
       if (response.ok) {
-        const newService = await response.json();
-        console.log('Saved service:', newService);
-        setSavedService(newService);
+        const savedServiceData = await response.json();
+        console.log('Saved service:', savedServiceData);
+        setSavedService(savedServiceData);
         
         // Update customer's serviceDate and service period
         const updateResponse = await fetch(`https://mkl-admin-backend.onrender.com/api/customers/${selectedCustomer._id}`, {
@@ -368,62 +413,44 @@ const NewServices = () => {
         </select>
       </div>
 
-      <div className="rounded-xl shadow-lg overflow-hidden bg-white">
-        <div className="overflow-x-auto overflow-y-auto" style={{maxHeight: '500px'}}>
-          <table className="w-full">
-            <thead className="text-white sticky top-0 z-10" style={{background: '#1e3a8a'}}>
-              <tr>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Name</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Phone</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm hidden md:table-cell">Area</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm hidden lg:table-cell">Address</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Service</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Brand</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Service Date</th>
-                <th className="px-4 md:px-6 py-3 text-left text-sm">Expire Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCustomers.map((customer, index) => {
-                const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date();
-                const expireDate = new Date(serviceDate);
-                expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
-                const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                const latestServiceDate = customerServiceDates[customer._id] ? new Date(customerServiceDates[customer._id]).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'No service';
-                
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                expireDate.setHours(0, 0, 0, 0);
-                const daysDelayed = Math.floor((today - expireDate) / (1000 * 60 * 60 * 24));
-                const isExpired = expireDate < today;
-                
-                return (
-                  <tr 
-                    key={customer._id || customer.id} 
-                    onClick={() => handleRowClick(customer)}
-                    className="cursor-pointer" style={{backgroundColor: index % 2 === 0 ? 'white' : '#1e3a8a1A'}}
-                  >
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{customer.name}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm">{customer.phone}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm hidden md:table-cell">{customer.area}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm hidden lg:table-cell">{customer.address}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm">{customer.service}M</td>
-                    <td className="px-4 md:px-6 py-4 text-sm">{customer.brand}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: '#1e3a8a'}}>{latestServiceDate}</td>
-                    <td className="px-4 md:px-6 py-4 text-sm font-semibold" style={{color: isExpired ? '#ef4444' : '#10b981'}}>
-                      {formattedExpireDate}
-                      {isExpired && <span className="ml-2 text-xs">({daysDelayed}d delay)</span>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {filteredCustomers.length === 0 && (
-          <div className="text-center py-8 text-gray-500">No customers found</div>
-        )}
-      </div>
+      <Table
+        columns={[
+          { header: 'Name', field: 'name', bold: true, color: '#1e3a8a' },
+          { header: 'Phone', field: 'phone' },
+          { header: 'Area', field: 'area', hideOnMobile: true },
+          { header: 'Address', field: 'address', hideOnTablet: true },
+          { header: 'Service', render: (customer) => `${customer.service}M` },
+          { header: 'Brand', field: 'brand' },
+          { header: 'Service Date', bold: true, color: '#1e3a8a', render: (customer) => {
+            const latestServiceDate = customerServiceDates[customer._id] 
+              ? new Date(customerServiceDates[customer._id]).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+              : 'No service';
+            return latestServiceDate;
+          }},
+          { header: 'Expire Date', bold: true, render: (customer) => {
+            const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date();
+            const expireDate = new Date(serviceDate);
+            expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+            const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            expireDate.setHours(0, 0, 0, 0);
+            const daysDelayed = Math.floor((today - expireDate) / (1000 * 60 * 60 * 24));
+            const isExpired = expireDate < today;
+            
+            return (
+              <span style={{color: isExpired ? '#ef4444' : '#10b981'}}>
+                {formattedExpireDate}
+                {isExpired && <span className="ml-2 text-xs">({daysDelayed}d delay)</span>}
+              </span>
+            );
+          }}
+        ]}
+        data={filteredCustomers}
+        onRowClick={handleRowClick}
+        emptyMessage="No customers found"
+      />
 
       {selectedCustomer && !showAddService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedCustomer(null)}>
@@ -476,6 +503,22 @@ const NewServices = () => {
                             <p className="font-semibold text-blue-900">Service Date: {new Date(service.serviceDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                             <p className="text-sm text-gray-600">Total: ₹{service.totalBill} | Payment: {service.paymentMode}</p>
                           </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => handleEditService(service, e)}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                              title="Edit Service"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={(e) => handleDeleteService(service._id, e)}
+                              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                              title="Delete Service"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -493,14 +536,16 @@ const NewServices = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddService(false)}>
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="text-white p-6 flex justify-between items-center" style={{background: '#1e3a8a'}}>
-              <h2 className="text-2xl font-bold">{selectedService ? 'View Service' : 'Add New Service'}</h2>
+              <h2 className="text-2xl font-bold">
+                {selectedService && !serviceData.totalBill ? 'View Service' : selectedService ? 'Edit Service' : 'Add New Service'}
+              </h2>
               <button onClick={() => setShowAddService(false)} className="hover:bg-blue-500 p-2 rounded-lg transition-colors">
                 <X size={24} />
               </button>
             </div>
 
             <div className="p-6 space-y-6">
-              {selectedService ? (
+              {selectedService && !serviceData.totalBill ? (
                 <>
                   <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
                     <h3 className="font-bold text-blue-900 mb-3">Service Details</h3>
@@ -664,7 +709,7 @@ const NewServices = () => {
                           className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
                         >
                           <Save size={20} />
-                          Save Service
+                          {selectedService ? 'Update Service' : 'Save Service'}
                         </button>
                       </>
                     )}
