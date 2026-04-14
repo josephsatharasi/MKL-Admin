@@ -8,16 +8,21 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [resetLink, setResetLink] = useState('');
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!email) {
+      setMessage({ type: 'error', text: 'Please enter your email' });
       return;
     }
 
     setLoading(true);
+    setMessage({ type: '', text: '' });
+    
+    console.log('Sending forgot password request for:', email);
+    
     try {
       const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: 'POST',
@@ -26,15 +31,17 @@ const ForgotPassword = () => {
       });
 
       const data = await response.json();
+      console.log('Response:', data);
 
       if (response.ok) {
+        setMessage({ type: 'success', text: 'Reset link sent! Check your email.' });
         setEmail('');
-        setResetLink('');
       } else {
-        console.error(data.message || 'Failed to send reset link');
+        setMessage({ type: 'error', text: data.message || 'Failed to send reset link' });
       }
     } catch (error) {
       console.error('Error:', error);
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -58,6 +65,12 @@ const ForgotPassword = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {message.text && (
+            <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {message.text}
+            </div>
+          )}
+          
           <div>
             <label className="block text-sm font-semibold text-blue-700 mb-2">Email <span className="text-red-500">*</span></label>
             <input

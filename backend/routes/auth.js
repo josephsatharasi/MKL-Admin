@@ -60,15 +60,35 @@ router.post('/login', async (req, res) => {
 // Forgot Password
 router.post('/forgot-password', async (req, res) => {
   try {
+    console.log('=== FORGOT PASSWORD REQUEST ===');
+    console.log('Request body:', req.body);
+    
     const { email } = req.body;
 
+    if (!email) {
+      console.log('Error: No email provided');
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    console.log('Looking for user with email:', email);
     const user = await User.findOne({ email });
+    
     if (!user) {
+      console.log('Error: User not found for email:', email);
       return res.status(404).json({ message: 'User not found' });
     }
 
+    console.log('User found:', user.username);
+    console.log('Generating reset token...');
+    
     const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const resetLink = `https://your-frontend-url.com/reset-password?token=${resetToken}`;
+    const resetLink = `https://mklenterprises.in/reset-password?token=${resetToken}`;
+    
+    console.log('Reset link generated:', resetLink);
+    console.log('Email config:', {
+      user: process.env.EMAIL_USER,
+      hasPassword: !!process.env.EMAIL_PASS
+    });
     
     // Send email
     const mailOptions = {
@@ -88,13 +108,19 @@ router.post('/forgot-password', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent to:', email);
+    console.log('Attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully!');
+    console.log('Message ID:', info.messageId);
+    console.log('Response:', info.response);
     
     res.json({ message: 'Reset link sent to your email' });
   } catch (error) {
-    console.error('Email error:', error);
-    res.status(500).json({ message: error.message });
+    console.error('=== EMAIL ERROR ===');
+    console.error('Error type:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Full error:', error);
+    res.status(500).json({ message: 'Failed to send email. Please check server logs.' });
   }
 });
 
