@@ -53,7 +53,7 @@ const NewServices = () => {
     const dates = {};
     for (const customer of customerList) {
       try {
-        const response = await fetch(`https://mkl-admin-backend.onrender.com/api/services/customer/${customer._id}`);
+        const response = await fetch(`${API_URL}/services/customer/${customer._id}`);
         const serviceData = await response.json();
         if (serviceData.length > 0) {
           const latestService = serviceData.sort((a, b) => new Date(b.serviceDate) - new Date(a.serviceDate))[0];
@@ -90,12 +90,20 @@ const NewServices = () => {
 
   const loadServices = async (customerId) => {
     try {
-      const response = await fetch(`https://mkl-admin-backend.onrender.com/api/services/customer/${customerId}`);
+      const response = await fetch(`${API_URL}/services/customer/${customerId}`);
       const data = await response.json();
       console.log('Loaded services:', data);
-      setServices(data);
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setServices(data);
+      } else {
+        console.error('Services data is not an array:', data);
+        setServices([]);
+      }
     } catch (error) {
       console.error('Error loading services:', error);
+      setServices([]);
     }
   };
 
@@ -154,19 +162,27 @@ const NewServices = () => {
     }
     
     try {
-      const response = await fetch(`https://mkl-admin-backend.onrender.com/api/services/${serviceId}`, {
+      const url = `${API_URL}/services/${serviceId}`;
+      console.log('Deleting service at URL:', url);
+      
+      const response = await fetch(url, {
         method: 'DELETE'
       });
+      
+      console.log('Delete response status:', response.status);
       
       if (response.ok) {
         console.log('Service deleted successfully');
         await loadServices(selectedCustomer._id);
         await loadAllServiceDates(customers);
       } else {
-        console.error('Failed to delete service');
+        const errorData = await response.json();
+        console.error('Failed to delete service:', errorData);
+        alert(`Failed to delete service: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error deleting service:', error);
+      alert('Error deleting service. Please try again.');
     }
   };
 
@@ -211,9 +227,11 @@ const NewServices = () => {
       // Check if we're editing an existing service
       const isEditing = selectedService && selectedService._id;
       const url = isEditing 
-        ? `https://mkl-admin-backend.onrender.com/api/services/${selectedService._id}`
-        : 'https://mkl-admin-backend.onrender.com/api/services';
+        ? `${API_URL}/services/${selectedService._id}`
+        : `${API_URL}/services`;
       const method = isEditing ? 'PUT' : 'POST';
+      
+      console.log(`${method} request to:`, url);
       
       const response = await fetch(url, {
         method: method,
@@ -221,13 +239,15 @@ const NewServices = () => {
         body: JSON.stringify(serviceRecord)
       });
       
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const savedServiceData = await response.json();
         console.log('Saved service:', savedServiceData);
         setSavedService(savedServiceData);
         
         // Update customer's serviceDate and service period
-        const updateResponse = await fetch(`https://mkl-admin-backend.onrender.com/api/customers/${selectedCustomer._id}`, {
+        const updateResponse = await fetch(`${API_URL}/customers/${selectedCustomer._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -395,21 +415,46 @@ const NewServices = () => {
           className="w-full px-4 py-3 bg-white border-2 rounded-lg focus:outline-none focus:ring-2 shadow-sm" style={{borderColor: '#1e3a8a33'}}
         >
           <option value="">All Areas</option>
-          <option value="Pendurthi">Pendurthi</option>
-          <option value="Kothavalasa">Kothavalasa</option>
+          <option value="Akkayapalem">Akkayapalem</option>
+          <option value="Allipuram">Allipuram</option>
           <option value="Anakapelly">Anakapelly</option>
+          <option value="Anumanthwada">Anumanthwada</option>
+          <option value="Birla Junction">Birla Junction</option>
+          <option value="Bujjirajupalem">Bujjirajupalem</option>
           <option value="Chinna Musaliwada">Chinna Musaliwada</option>
-          <option value="NAD Junction">NAD Junction</option>
-          <option value="Marripalem">Marripalem</option>
-          <option value="Gajuwaka">Gajuwaka</option>
-          <option value="Koramanapalem">Koramanapalem</option>
+          <option value="Chinnawaltair">Chinnawaltair</option>
+          <option value="Chodavaram">Chodavaram</option>
+          <option value="Dabagardens">Dabagardens</option>
           <option value="Duvvada">Duvvada</option>
+          <option value="Dwarakanagar">Dwarakanagar</option>
+          <option value="Endada">Endada</option>
+          <option value="Gajuwaka">Gajuwaka</option>
+          <option value="Gopalapatnam">Gopalapatnam</option>
+          <option value="Hanumanthwada">Hanumanthwada</option>
           <option value="Kancherapalem">Kancherapalem</option>
-          <option value="RTC Complex">RTC Complex</option>
+          <option value="Koramanapalem">Koramanapalem</option>
+          <option value="Kothavalasa">Kothavalasa</option>
+          <option value="Maddipalem">Maddipalem</option>
           <option value="Madhurapalem">Madhurapalem</option>
           <option value="Madhuruwada">Madhuruwada</option>
-          <option value="Endada">Endada</option>
-          <option value="Anumanthwada">Anumanthwada</option>
+          <option value="Malkapuram">Malkapuram</option>
+          <option value="Marripalem">Marripalem</option>
+          <option value="MVP Colony">MVP Colony</option>
+          <option value="NAD Junction">NAD Junction</option>
+          <option value="Naiduthota">Naiduthota</option>
+          <option value="Peddawaltair">Peddawaltair</option>
+          <option value="Pendurthi">Pendurthi</option>
+          <option value="PM Palem">PM Palem</option>
+          <option value="Poorana Market">Poorana Market</option>
+          <option value="RTC Complex">RTC Complex</option>
+          <option value="Sabbavaram">Sabbavaram</option>
+          <option value="Sheelanagar">Sheelanagar</option>
+          <option value="Shulanager">Shulanager</option>
+          <option value="Siripuram">Siripuram</option>
+          <option value="Skota">Skota</option>
+          <option value="Sriharipuram">Sriharipuram</option>
+          <option value="Sujathanagar">Sujathanagar</option>
+          <option value="Vepagunta">Vepagunta</option>
         </select>
       </div>
 
@@ -473,7 +518,7 @@ const NewServices = () => {
                       className="px-3 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     >
                       <option value="">All Years</option>
-                      {[...new Set(services.map(s => new Date(s.serviceDate).getFullYear()))]
+                      {Array.isArray(services) && services.length > 0 && [...new Set(services.map(s => new Date(s.serviceDate).getFullYear()))]
                         .sort((a, b) => b - a)
                         .map(year => (
                           <option key={year} value={year}>{year}</option>
@@ -488,7 +533,7 @@ const NewServices = () => {
                     </button>
                   </div>
                 </div>
-                {services.filter(s => !yearFilter || new Date(s.serviceDate).getFullYear().toString() === yearFilter).length > 0 ? (
+                {Array.isArray(services) && services.filter(s => !yearFilter || new Date(s.serviceDate).getFullYear().toString() === yearFilter).length > 0 ? (
                   <div className="space-y-2">
                     {services
                       .filter(s => !yearFilter || new Date(s.serviceDate).getFullYear().toString() === yearFilter)

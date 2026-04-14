@@ -344,6 +344,7 @@ const AddCustomer = () => {
             <option value="Akkayapalem">Akkayapalem</option>
             <option value="Allipuram">Allipuram</option>
             <option value="Anakapelly">Anakapelly</option>
+            <option value="Anumanthwada">Anumanthwada</option>
             <option value="Birla Junction">Birla Junction</option>
             <option value="Bujjirajupalem">Bujjirajupalem</option>
             <option value="Chinna Musaliwada">Chinna Musaliwada</option>
@@ -360,6 +361,7 @@ const AddCustomer = () => {
             <option value="Koramanapalem">Koramanapalem</option>
             <option value="Kothavalasa">Kothavalasa</option>
             <option value="Maddipalem">Maddipalem</option>
+            <option value="Madhurapalem">Madhurapalem</option>
             <option value="Madhuruwada">Madhuruwada</option>
             <option value="Malkapuram">Malkapuram</option>
             <option value="Marripalem">Marripalem</option>

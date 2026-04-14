@@ -19,24 +19,26 @@ const Dashboard = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
       let expiringSoon = 0;
       let expired = 0;
-      let serviceCustomers = 0;
+      let currentMonthServiceCustomers = 0;
       
       customers.forEach(customer => {
-        // Count customers who have taken a service (service field must be a valid number > 0)
+        // Count customers with service value added in current month
         const serviceValue = customer.service ? parseInt(customer.service) : 0;
-        
-        // Debug: Log customer service values
-        console.log(`Customer: ${customer.name}, Service: "${customer.service}", Parsed: ${serviceValue}`);
-        
         if (serviceValue > 0) {
-          serviceCustomers++;
+          const customerDate = new Date(customer.createdAt);
+          if (customerDate.getMonth() === currentMonth && customerDate.getFullYear() === currentYear) {
+            currentMonthServiceCustomers++;
+          }
         }
         
         if (customer.followUpStatus === 'completed') return;
         
-        // Only calculate expiry for customers with service
+        // Calculate expiry for customers with service
         if (serviceValue > 0) {
           const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
           const expireDate = new Date(serviceDate);
@@ -53,11 +55,9 @@ const Dashboard = () => {
         }
       });
       
-      console.log(`Total Customers: ${customers.length}, Service Customers: ${serviceCustomers}`);
-      
       setStats({
         total: customers.length,
-        active: serviceCustomers,
+        active: currentMonthServiceCustomers,
         expiringSoon,
         expired,
       });
@@ -67,7 +67,7 @@ const Dashboard = () => {
 
   const cards = [
     { title: 'Total Customers', value: stats.total, icon: Users, color: 'bg-blue-50', link: '/admin/customers' },
-    { title: 'Total Service Customers', value: stats.active, icon: CheckCircle, color: 'bg-blue-50', link: '/admin/current-month-customers' },
+    { title: 'Current Month Service Customers', value: stats.active, icon: CheckCircle, color: 'bg-blue-50', link: '/admin/current-month-customers' },
     { title: 'Service Soon', value: stats.expiringSoon, icon: AlertTriangle, color: 'bg-blue-50', link: '/admin/service-soon' },
     { title: 'Service Delay', value: stats.expired, icon: XCircle, color: 'bg-blue-50', link: '/admin/service-delay' },
   ];
