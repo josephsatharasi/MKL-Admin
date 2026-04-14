@@ -14,6 +14,17 @@ export const getCustomers = async (excludeImages = true) => {
   }
 };
 
+export const getCustomerById = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/customers/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch customer');
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching customer:', error);
+    return null;
+  }
+};
+
 export const addCustomer = async (customer) => {
   try {
     const response = await fetch(`${API_URL}/customers`, {

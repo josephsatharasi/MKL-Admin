@@ -1,20 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Phone, Mail, MapPin, Package, Calendar, Edit2, Download } from 'lucide-react';
-import { updateCustomer } from '../utils/storage';
+import { updateCustomer, getCustomerById } from '../utils/storage';
 
 const CustomerDetails = ({ customer, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPicsModal, setShowPicsModal] = useState(false);
   const [fullScreenImage, setFullScreenImage] = useState(null);
-  console.log('Customer data:', customer);
-  console.log('Additional pics:', customer.additionalPics);
+  const [fullCustomer, setFullCustomer] = useState(customer);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadFullCustomer = async () => {
+      try {
+        const data = await getCustomerById(customer._id || customer.id);
+        if (data) {
+          setFullCustomer(data);
+        }
+      } catch (error) {
+        console.error('Error loading full customer:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadFullCustomer();
+  }, [customer._id, customer.id]);
+  
   const [formData, setFormData] = useState({
-    name: customer.name || '',
-    phone: customer.phone || '',
-    address: customer.address || '',
-    area: customer.area || '',
-    brand: customer.brand || '',
-    service: customer.service || ''
+    name: fullCustomer.name || '',
+    phone: fullCustomer.phone || '',
+    address: fullCustomer.address || '',
+    area: fullCustomer.area || '',
+    brand: fullCustomer.brand || '',
+    service: fullCustomer.service || ''
   });
 
   const handleInputChange = (e) => {
@@ -23,7 +40,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await updateCustomer(customer._id || customer.id, formData);
+      await updateCustomer(fullCustomer._id || fullCustomer.id, formData);
       setIsEditing(false);
       if (onUpdate) onUpdate();
       onClose();
@@ -38,12 +55,23 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
     return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
   };
 
-  const serviceDate = customer.serviceDate 
-    ? parseDate(customer.serviceDate) 
-    : (customer.createdAt ? new Date(customer.createdAt) : new Date());
+  const serviceDate = fullCustomer.serviceDate 
+    ? parseDate(fullCustomer.serviceDate) 
+    : (fullCustomer.createdAt ? new Date(fullCustomer.createdAt) : new Date());
   const expireDate = new Date(serviceDate);
-  expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+  expireDate.setMonth(expireDate.getMonth() + parseInt(fullCustomer.service || 0));
   const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl p-8">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+          <p className="mt-4 text-gray-600">Loading customer details...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -65,8 +93,8 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
         <div className="p-6 space-y-6">
           <div className="flex justify-center">
             <div className="w-32 h-32 rounded-full border-4 overflow-hidden bg-gray-100" style={{borderColor: '#1e3a8a'}}>
-              {customer.profilePic ? (
-                <img src={customer.profilePic} alt={customer.name} className="w-full h-full object-cover" />
+              {fullCustomer.profilePic ? (
+                <img src={fullCustomer.profilePic} alt={fullCustomer.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <User size={60} className="text-gray-400" />
@@ -83,7 +111,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 {isEditing ? (
                   <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
-                  <p className="font-semibold text-blue-900">{customer.name}</p>
+                  <p className="font-semibold text-blue-900">{fullCustomer.name}</p>
                 )}
               </div>
             </div>
@@ -95,7 +123,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 {isEditing ? (
                   <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
-                  <p className="font-semibold text-blue-900">{customer.phone}</p>
+                  <p className="font-semibold text-blue-900">{fullCustomer.phone}</p>
                 )}
               </div>
             </div>
@@ -107,7 +135,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 {isEditing ? (
                   <input type="text" name="area" value={formData.area} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
-                  <p className="font-semibold text-blue-900">{customer.area}</p>
+                  <p className="font-semibold text-blue-900">{fullCustomer.area}</p>
                 )}
               </div>
             </div>
@@ -119,7 +147,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 {isEditing ? (
                   <input type="text" name="brand" value={formData.brand} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
-                  <p className="font-semibold text-blue-900">{customer.brand}</p>
+                  <p className="font-semibold text-blue-900">{fullCustomer.brand}</p>
                 )}
               </div>
             </div>
@@ -131,7 +159,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                 {isEditing ? (
                   <input type="number" name="service" value={formData.service} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" />
                 ) : (
-                  <p className="font-semibold text-blue-900">{customer.service}M</p>
+                  <p className="font-semibold text-blue-900">{fullCustomer.service}M</p>
                 )}
               </div>
             </div>
@@ -141,12 +169,12 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
               <div>
                 <p className="text-sm text-gray-600">Customer Registered</p>
                 <p className="font-semibold text-blue-900">
-                  {customer.serviceDate 
+                  {fullCustomer.serviceDate 
                     ? (() => {
-                        const [year, month, day] = customer.serviceDate.split('-');
+                        const [year, month, day] = fullCustomer.serviceDate.split('-');
                         return `${day}/${month}/${year}`;
                       })()
-                    : (customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A')}
+                    : (fullCustomer.createdAt ? new Date(fullCustomer.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A')}
                 </p>
               </div>
             </div>
@@ -159,7 +187,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
               </div>
             </div>
 
-            {customer.additionalPics && customer.additionalPics.length > 0 && (
+            {fullCustomer.additionalPics && fullCustomer.additionalPics.length > 0 && (
               <div className="flex items-start gap-3">
                 <Package className="mt-1" style={{color: '#1e3a8a'}} size={20} />
                 <div>
@@ -168,7 +196,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
                     onClick={() => setShowPicsModal(true)}
                     className="font-semibold text-blue-600 hover:underline"
                   >
-                    View Pictures ({customer.additionalPics.length})
+                    View Pictures ({fullCustomer.additionalPics.length})
                   </button>
                 </div>
               </div>
@@ -182,7 +210,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
               {isEditing ? (
                 <textarea name="address" value={formData.address} onChange={handleInputChange} className="w-full px-2 py-1 border rounded" rows="2" />
               ) : (
-                <p className="font-semibold text-blue-900">{customer.address}</p>
+                <p className="font-semibold text-blue-900">{fullCustomer.address}</p>
               )}
             </div>
           </div>
@@ -190,14 +218,14 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-bold text-blue-900 mb-2">Additional Information</h3>
             <div className="text-sm text-gray-600">
-              <p>Customer ID: #{customer._id || customer.id}</p>
-              <p>Registered: {new Date(customer.createdAt).toLocaleDateString()}</p>
-              {customer.additionalPics && customer.additionalPics.length > 0 && (
+              <p>Customer ID: #{fullCustomer._id || fullCustomer.id}</p>
+              <p>Registered: {new Date(fullCustomer.createdAt).toLocaleDateString()}</p>
+              {fullCustomer.additionalPics && fullCustomer.additionalPics.length > 0 && (
                 <button
                   onClick={() => setShowPicsModal(true)}
                   className="mt-2 text-blue-600 hover:underline font-semibold"
                 >
-                  View Photos ({customer.additionalPics.length})
+                  View Photos ({fullCustomer.additionalPics.length})
                 </button>
               )}
             </div>
@@ -226,7 +254,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
               </button>
             </div>
             <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {customer.additionalPics.map((pic, idx) => (
+              {fullCustomer.additionalPics.map((pic, idx) => (
                 <div key={idx} className="relative group cursor-pointer" onClick={() => setFullScreenImage(pic)}>
                   <img src={pic} alt={`Additional ${idx + 1}`} className="w-full h-48 object-contain rounded border-2 border-blue-200 bg-gray-50" />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded flex items-center justify-center">
@@ -245,7 +273,7 @@ const CustomerDetails = ({ customer, onClose, onUpdate }) => {
           <div className="absolute top-4 right-4 flex gap-2">
             <a 
               href={fullScreenImage} 
-              download={`customer-${customer.name}-image-${Date.now()}.jpg`}
+              download={`customer-${fullCustomer.name}-image-${Date.now()}.jpg`}
               className="text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 p-2 rounded"
               onClick={(e) => e.stopPropagation()}
             >

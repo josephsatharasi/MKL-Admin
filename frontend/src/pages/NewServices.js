@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Upload, Save, Download, Plus, Edit2, Trash2 } from 'lucide-react';
 import { getCustomers } from '../utils/storage';
 import Table from '../components/Table';
+import ConfirmModal from '../components/ConfirmModal';
 import jsPDF from 'jspdf';
 
 const NewServices = () => {
@@ -16,6 +17,8 @@ const NewServices = () => {
   const [savedService, setSavedService] = useState(null);
   const [fullScreenImage, setFullScreenImage] = useState(null);
   const [customerServiceDates, setCustomerServiceDates] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, serviceId: null });
   const API_URL = process.env.REACT_APP_API_URL;
   const [serviceData, setServiceData] = useState({
     spareParts: {
@@ -42,9 +45,11 @@ const NewServices = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
       const data = await getCustomers();
       setCustomers(data);
       await loadAllServiceDates();
+      setIsLoading(false);
     };
     loadData();
   }, []);
@@ -75,6 +80,27 @@ const NewServices = () => {
     
     return matchesSearch && matchesArea && !isExpired;
   });
+
+  const getServiceDate = (customerId) => {
+    return customerServiceDates[customerId] 
+      ? new Date(customerServiceDates[customerId]).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      : 'No service';
+  };
+
+  const getExpireDate = (customer) => {
+    const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date();
+    const expireDate = new Date(serviceDate);
+    expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
+    const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    expireDate.setHours(0, 0, 0, 0);
+    const daysDelayed = Math.floor((today - expireDate) / (1000 * 60 * 60 * 24));
+    const isExpired = expireDate < today;
+    
+    return { formattedExpireDate, isExpired, daysDelayed };
+  };
 
   const handleRowClick = async (customer) => {
     setSelectedCustomer(customer);
@@ -128,32 +154,62 @@ const NewServices = () => {
     });
   };
 
-  const handleViewService = (service) => {
+  const handleViewService = async (service) => {
     console.log('Viewing service:', service);
-    setSelectedService(service);
+    
+    // Fetch full service details with images
+    try {
+      const response = await fetch(`${API_URL}/services/${service._id}`);
+      const fullService = await response.json();
+      setSelectedService(fullService);
+    } catch (error) {
+      console.error('Error loading full service:', error);
+      setSelectedService(service);
+    }
+    
     setShowAddService(true);
   };
 
-  const handleEditService = (service, e) => {
+  const handleEditService = async (service, e) => {
     e.stopPropagation();
     console.log('Editing service:', service);
-    setSelectedService(service);
-    setServiceData({
-      spareParts: service.spareParts,
-      images: service.images || [],
-      totalBill: service.totalBill,
-      paymentMode: service.paymentMode,
-      serviceDate: service.serviceDate,
-      reminderMonths: service.reminderMonths?.toString() || '3'
-    });
+    
+    // Fetch full service details with images
+    try {
+      const response = await fetch(`${API_URL}/services/${service._id}`);
+      const fullService = await response.json();
+      setSelectedService(fullService);
+      setServiceData({
+        spareParts: fullService.spareParts,
+        images: fullService.images || [],
+        totalBill: fullService.totalBill,
+        paymentMode: fullService.paymentMode,
+        serviceDate: fullService.serviceDate,
+        reminderMonths: fullService.reminderMonths?.toString() || '3'
+      });
+    } catch (error) {
+      console.error('Error loading full service:', error);
+      setSelectedService(service);
+      setServiceData({
+        spareParts: service.spareParts,
+        images: service.images || [],
+        totalBill: service.totalBill,
+        paymentMode: service.paymentMode,
+        serviceDate: service.serviceDate,
+        reminderMonths: service.reminderMonths?.toString() || '3'
+      });
+    }
+    
     setShowAddService(true);
   };
 
   const handleDeleteService = async (serviceId, e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this service record?')) {
-      return;
-    }
+    setDeleteConfirm({ isOpen: true, serviceId });
+  };
+
+  const confirmDeleteService = async () => {
+    const serviceId = deleteConfirm.serviceId;
     
     try {
       const url = `${API_URL}/services/${serviceId}`;
@@ -167,7 +223,11 @@ const NewServices = () => {
       
       if (response.ok) {
         console.log('Service deleted successfully');
-        await loadServices(selectedCustomer._id);
+        
+        // Immediately update UI by removing the service from the list
+        setServices(prevServices => prevServices.filter(s => s._id !== serviceId));
+        
+        // Then reload data in background
         await loadAllServiceDates();
       } else {
         const errorData = await response.json();
@@ -452,6 +512,12 @@ const NewServices = () => {
         </select>
       </div>
 
+      {isLoading ? (
+        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+          <p className="mt-4 text-gray-600">Loading customers...</p>
+        </div>
+      ) : (
       <Table
         columns={[
           { header: 'Name', field: 'name', bold: true, color: '#1e3a8a' },
@@ -460,24 +526,9 @@ const NewServices = () => {
           { header: 'Address', field: 'address', hideOnTablet: true },
           { header: 'Service', render: (customer) => `${customer.service}M` },
           { header: 'Brand', field: 'brand' },
-          { header: 'Service Date', bold: true, color: '#1e3a8a', render: (customer) => {
-            const latestServiceDate = customerServiceDates[customer._id] 
-              ? new Date(customerServiceDates[customer._id]).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
-              : 'No service';
-            return latestServiceDate;
-          }},
+          { header: 'Service Date', bold: true, color: '#1e3a8a', render: (customer) => getServiceDate(customer._id) },
           { header: 'Expire Date', bold: true, render: (customer) => {
-            const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date();
-            const expireDate = new Date(serviceDate);
-            expireDate.setMonth(expireDate.getMonth() + parseInt(customer.service || 0));
-            const formattedExpireDate = expireDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            expireDate.setHours(0, 0, 0, 0);
-            const daysDelayed = Math.floor((today - expireDate) / (1000 * 60 * 60 * 24));
-            const isExpired = expireDate < today;
-            
+            const { formattedExpireDate, isExpired, daysDelayed } = getExpireDate(customer);
             return (
               <span style={{color: isExpired ? '#ef4444' : '#10b981'}}>
                 {formattedExpireDate}
@@ -490,6 +541,7 @@ const NewServices = () => {
         onRowClick={handleRowClick}
         emptyMessage="No customers found"
       />
+      )}
 
       {selectedCustomer && !showAddService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedCustomer(null)}>
@@ -778,6 +830,14 @@ const NewServices = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, serviceId: null })}
+        onConfirm={confirmDeleteService}
+        title="Delete Service Record"
+        message="Are you sure you want to delete this service record? This action cannot be undone."
+      />
     </div>
   );
 };
