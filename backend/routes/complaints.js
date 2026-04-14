@@ -6,7 +6,9 @@ const Customer = require('../models/Customer');
 // Get all complaints
 router.get('/', async (req, res) => {
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 });
+    const complaints = await Complaint.find()
+      .sort({ createdAt: -1 })
+      .lean();
     res.json(complaints);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -19,14 +21,14 @@ router.post('/', async (req, res) => {
     const { customerName, subject, body } = req.body;
     
     // Verify customer exists
-    const customer = await Customer.findOne({ name: { $regex: new RegExp(`^${customerName}$`, 'i') } });
+    const customer = await Customer.findOne({ name: { $regex: new RegExp(`^${customerName}$`, 'i') } }).lean();
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found in the system' });
     }
 
     const complaint = new Complaint({ customerName, subject, body });
     await complaint.save();
-    res.status(201).json(complaint);
+    res.status(201).json(complaint.toObject());
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -44,7 +46,7 @@ router.patch('/:id', async (req, res) => {
       req.params.id,
       updateData,
       { new: true }
-    );
+    ).lean();
     res.json(complaint);
   } catch (error) {
     res.status(400).json({ message: error.message });

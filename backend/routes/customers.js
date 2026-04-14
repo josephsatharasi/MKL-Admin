@@ -27,7 +27,10 @@ router.get('/search/:name', async (req, res) => {
   try {
     const customers = await Customer.find({ 
       name: { $regex: req.params.name, $options: 'i' } 
-    }).sort({ createdAt: -1 });
+    })
+    .select('-profilePic -additionalPics -__v')
+    .sort({ createdAt: -1 })
+    .lean();
     res.json(customers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -37,7 +40,7 @@ router.get('/search/:name', async (req, res) => {
 // Get single customer
 router.get('/:id', async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await Customer.findById(req.params.id).lean();
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     res.json(customer);
   } catch (error) {
@@ -60,7 +63,7 @@ router.post('/', async (req, res) => {
       hasProfilePic: !!newCustomer.profilePic,
       additionalPicsCount: newCustomer.additionalPics?.length || 0
     });
-    res.status(201).json(newCustomer);
+    res.status(201).json(newCustomer.toObject());
   } catch (error) {
     console.error('Error saving customer:', error.message);
     res.status(400).json({ message: error.message });
@@ -70,7 +73,7 @@ router.post('/', async (req, res) => {
 // Update customer
 router.put('/:id', async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true }).lean();
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     res.json(customer);
   } catch (error) {
@@ -85,7 +88,7 @@ router.patch('/:id/status', async (req, res) => {
       req.params.id,
       { followUpStatus: req.body.status },
       { new: true }
-    );
+    ).lean();
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     res.json(customer);
   } catch (error) {

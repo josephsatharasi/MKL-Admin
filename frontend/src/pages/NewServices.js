@@ -16,7 +16,7 @@ const NewServices = () => {
   const [savedService, setSavedService] = useState(null);
   const [fullScreenImage, setFullScreenImage] = useState(null);
   const [customerServiceDates, setCustomerServiceDates] = useState({});
-  const API_URL = process.env.REACT_APP_API_URL || 'https://mkl-admin-backend.onrender.com/api';
+  const API_URL = process.env.REACT_APP_API_URL;
   const [serviceData, setServiceData] = useState({
     spareParts: {
       'Sediment': false,
@@ -44,26 +44,20 @@ const NewServices = () => {
     const loadData = async () => {
       const data = await getCustomers();
       setCustomers(data);
-      await loadAllServiceDates(data);
+      await loadAllServiceDates();
     };
     loadData();
   }, []);
 
-  const loadAllServiceDates = async (customerList) => {
-    const dates = {};
-    for (const customer of customerList) {
-      try {
-        const response = await fetch(`${API_URL}/services/customer/${customer._id}`);
-        const serviceData = await response.json();
-        if (serviceData.length > 0) {
-          const latestService = serviceData.sort((a, b) => new Date(b.serviceDate) - new Date(a.serviceDate))[0];
-          dates[customer._id] = latestService.serviceDate;
-        }
-      } catch (error) {
-        console.error('Error loading service date:', error);
-      }
+  const loadAllServiceDates = async () => {
+    try {
+      // Use optimized API to get all latest service dates at once
+      const response = await fetch(`${API_URL}/services/stats/latest-dates`);
+      const dates = await response.json();
+      setCustomerServiceDates(dates);
+    } catch (error) {
+      console.error('Error loading service dates:', error);
     }
-    setCustomerServiceDates(dates);
   };
 
   const filteredCustomers = customers.filter(c => {
@@ -174,7 +168,7 @@ const NewServices = () => {
       if (response.ok) {
         console.log('Service deleted successfully');
         await loadServices(selectedCustomer._id);
-        await loadAllServiceDates(customers);
+        await loadAllServiceDates();
       } else {
         const errorData = await response.json();
         console.error('Failed to delete service:', errorData);
@@ -263,7 +257,7 @@ const NewServices = () => {
         }
         
         await loadServices(selectedCustomer._id);
-        await loadAllServiceDates(customers);
+        await loadAllServiceDates();
       }
     } catch (error) {
       console.error('Save error:', error);

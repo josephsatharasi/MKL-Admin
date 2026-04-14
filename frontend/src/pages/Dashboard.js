@@ -12,6 +12,7 @@ const Dashboard = () => {
   });
 
   const [recentActivity, setRecentActivity] = useState([]);
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const loadData = async () => {
@@ -24,21 +25,21 @@ const Dashboard = () => {
       
       let expiringSoon = 0;
       let expired = 0;
+      
+      // Use optimized API call to get monthly customer count
       let currentMonthServiceCustomers = 0;
+      try {
+        const response = await fetch(`${API_URL}/services/stats/monthly-customers?month=${currentMonth}&year=${currentYear}`);
+        const data = await response.json();
+        currentMonthServiceCustomers = data.count || 0;
+      } catch (error) {
+        console.error('Error loading monthly stats:', error);
+      }
       
       customers.forEach(customer => {
-        // Count customers with service value added in current month
-        const serviceValue = customer.service ? parseInt(customer.service) : 0;
-        if (serviceValue > 0) {
-          const customerDate = new Date(customer.createdAt);
-          if (customerDate.getMonth() === currentMonth && customerDate.getFullYear() === currentYear) {
-            currentMonthServiceCustomers++;
-          }
-        }
-        
         if (customer.followUpStatus === 'completed') return;
         
-        // Calculate expiry for customers with service
+        const serviceValue = customer.service ? parseInt(customer.service) : 0;
         if (serviceValue > 0) {
           const serviceDate = customer.serviceDate ? new Date(customer.serviceDate) : new Date(customer.createdAt);
           const expireDate = new Date(serviceDate);
